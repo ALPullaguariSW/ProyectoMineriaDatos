@@ -38,9 +38,13 @@ def generate_html_report(scan_results_file="scan_report.json", shap_image_path="
     for res in results.get("results", []):
         if res.get('status') == 'VULNERABLE':
             vulnerable_files_list.append(res)
-            # Count types
-            if res.get('details') and isinstance(res['details'].get('dangerous_calls'), list):
-                for finding in res['details']['dangerous_calls']:
+            
+            # Get findings list
+            findings = res.get('details', {}).get('dangerous_calls', [])
+            
+            if findings:
+                # Count specific vulnerability types
+                for finding in findings:
                     if isinstance(finding, dict):
                         v_type = finding['type']
                         vuln_types[v_type] = vuln_types.get(v_type, 0) + 1
@@ -48,7 +52,8 @@ def generate_html_report(scan_results_file="scan_report.json", shap_image_path="
                         # Fallback for old string format
                         vuln_types['Generic Risk'] = vuln_types.get('Generic Risk', 0) + 1
             else:
-                 vuln_types['ML Predicted Risk'] = vuln_types.get('ML Predicted Risk', 0) + 1
+                # If no specific findings, categorize as ML Prediction
+                vuln_types['ML Predicted Risk'] = vuln_types.get('ML Predicted Risk', 0) + 1
         else:
             safe_files_list.append(res)
 
