@@ -65,141 +65,170 @@ def generate_html_report(scan_results_file="scan_report.json", shap_image_path="
     </head>
     <body>
         <header>
-            <h1>🛡️ Reporte de Análisis de Seguridad (SEMMA)</h1>
-            <p>Generado automáticamente por el Pipeline de Minería de Datos</p>
+            <h1>🛡️ Dashboard de Seguridad</h1>
+            <div class="subtitle">Análisis Automatizado de Vulnerabilidades</div>
         </header>
 
         <div class="container">
-            <!-- Executive Summary -->
-            <div class="card">
-                <h2>📊 Resumen Ejecutivo</h2>
-                <div class="stats-grid">
-                    <div class="stat-box">
-                        <div class="stat-number">{total_files}</div>
-                        <div class="stat-label">Archivos Escaneados</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-number" style="color: {'#e74c3c' if vulnerable_files > 0 else '#27ae60'}">{vulnerable_files}</div>
-                        <div class="stat-label">Archivos Vulnerables</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-number safe">{safe_files}</div>
-                        <div class="stat-label">Archivos Seguros</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-number" style="color: #3498db">{scan_duration}s</div>
-                        <div class="stat-label">Tiempo de Escaneo</div>
-                    </div>
+            
+            <!-- Key Metrics Row -->
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-number" style="color: #e74c3c">{vulnerable_files}</div>
+                    <div class="stat-label">Archivos Críticos</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" style="color: #27ae60">{safe_files}</div>
+                    <div class="stat-label">Archivos Seguros</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" style="color: #3498db">{len(vuln_types)}</div>
+                    <div class="stat-label">Tipos de Riesgo</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{scan_duration}s</div>
+                    <div class="stat-label">Duración</div>
                 </div>
             </div>
 
-            <!-- Explainability Section -->
-            <div class="card">
-                <h2>🧠 Explicabilidad del Modelo (XAI)</h2>
-                <p>Este gráfico muestra qué características (palabras clave, métricas) influyeron más en las decisiones del modelo.</p>
-                
-                <div class="shap-container">
+            <!-- Charts Row -->
+            <div class="dashboard-grid">
+                <div class="chart-card">
+                    <h3 style="text-align:center; margin-bottom:15px;">Distribución de Archivos</h3>
+                    <canvas id="filesChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3 style="text-align:center; margin-bottom:15px;">Top Vulnerabilidades</h3>
+                    <canvas id="vulnChart"></canvas>
+                </div>
+            </div>
+
+            <!-- SHAP Section -->
+            <h2 class="section-title">🧠 Análisis de Inteligencia Artificial</h2>
+            <div class="chart-card">
+                <div style="text-align: center;">
                     {f'<img src="data:image/png;base64,{shap_b64}" class="shap-img" alt="SHAP Summary Plot">' if shap_b64 else '<p>No se generó gráfico SHAP.</p>'}
                 </div>
-
                 <div class="shap-guide">
-                    <h3>📖 Guía de Interpretación Técnica</h3>
-                    <p>Este gráfico de <strong>SHAP (SHapley Additive exPlanations)</strong> desglosa la predicción del modelo:</p>
-                    <ul>
-                        <li><strong>Eje Y (Características):</strong> Las variables más importantes están arriba. Si ves palabras como <code>eval</code>, <code>exec</code> o <code>complexity</code> arriba, significa que son los factores decisivos.</li>
-                        <li><strong>Eje X (Valor SHAP):</strong> Indica el impacto en la predicción.
-                            <ul>
-                                <li>➡️ <strong>Derecha (Positivo):</strong> Empuja la predicción hacia <strong>VULNERABLE (Clase 1)</strong>.</li>
-                                <li>⬅️ <strong>Izquierda (Negativo):</strong> Empuja la predicción hacia <strong>SEGURO (Clase 0)</strong>.</li>
-                            </ul>
-                        </li>
-                        <li><strong>Color (Valor de la Característica):</strong>
-                            <ul>
-                                <li>🔴 <strong>Rojo (Alto):</strong> Un valor alto de esta característica (ej: alta complejidad) causa el impacto.</li>
-                                <li>🔵 <strong>Azul (Bajo):</strong> La ausencia o valor bajo de esta característica causa el impacto.</li>
-                            </ul>
-                        </li>
-                    </ul>
-                    <p><em>Ejemplo:</em> Si ves una barra roja larga hacia la derecha para la característica <code>complexity</code>, significa que la <strong>alta complejidad</strong> del código está aumentando drásticamente el riesgo de vulnerabilidad.</p>
+                    <h3>📖 Interpretación del Modelo</h3>
+                    <p>El gráfico superior muestra los factores decisivos para la IA. Las barras <strong>rojas</strong> hacia la derecha indican características que aumentan el riesgo.</p>
                 </div>
             </div>
 
-            <!-- Detailed Findings -->
-            <div class="card" style="background: transparent; box-shadow: none;">
-                <h2>🔍 Hallazgos Detallados</h2>
-                <!-- Cards Loop -->
+            <!-- Critical Findings Section -->
+            <h2 class="section-title" style="color: #c0392b;">🚨 Hallazgos Críticos ({len(vulnerable_files_list)})</h2>
+            
+            {'' if vulnerable_files_list else '<p style="text-align:center; padding:20px; background:white; border-radius:8px;">✅ ¡Felicidades! No se encontraron vulnerabilidades críticas.</p>'}
     """
 
-    # Add Cards
-    for file_result in results.get("results", []):
-        is_vuln = file_result.get('status') == 'VULNERABLE'
-        status_class = "vulnerable" if is_vuln else "safe"
-        badge_class = "badge-high" if is_vuln else "badge-safe"
-        status_text = file_result.get('status', 'UNKNOWN')
+    # Generate Cards for Vulnerable Files
+    for file_result in vulnerable_files_list:
         prob = f"{file_result.get('confidence', 0):.2%}"
-        
         details_html = ""
+        
         if file_result.get('details'):
             details = file_result['details']
-            
-            # New Rich Findings (List of Dicts)
-            if isinstance(details.get('dangerous_calls'), list) and len(details['dangerous_calls']) > 0:
-                first_item = details['dangerous_calls'][0]
-                if isinstance(first_item, dict):
-                    details_html += "<div style='margin-top: 15px;'>"
-                    for finding in details['dangerous_calls']:
+            if isinstance(details.get('dangerous_calls'), list):
+                for finding in details['dangerous_calls']:
+                    if isinstance(finding, dict):
                         severity_color = "#e74c3c" if finding['severity'] in ["Critical", "High"] else "#f39c12"
                         details_html += f"""
-                        <div style="border-left: 4px solid {severity_color}; background: #fff; padding: 15px; margin-bottom: 15px; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                                <strong style="color: {severity_color}; font-size: 1.1em;">{finding['type']} <span style="font-size:0.8em; opacity:0.8;">({finding['severity']})</span></strong>
-                                <span style="background: #34495e; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.9em;">Línea {finding['line']}</span>
+                        <div style="border-left: 4px solid {severity_color}; background: #fcfcfc; padding: 15px; margin-bottom: 15px; border-radius: 4px; border: 1px solid #eee;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <strong style="color: {severity_color};">{finding['type']}</strong>
+                                <span style="background: #34495e; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.8em;">Línea {finding['line']}</span>
                             </div>
-                            <p style="margin: 5px 0; color: #555;">{finding['description']}</p>
-                            <div style="background: #2c3e50; color: #ecf0f1; padding: 10px; border-radius: 4px; font-family: 'Consolas', monospace; margin: 10px 0; overflow-x: auto;">
+                            <p style="margin: 5px 0; color: #555; font-size: 0.95em;">{finding['description']}</p>
+                            <div style="background: #2c3e50; color: #ecf0f1; padding: 10px; border-radius: 4px; font-family: monospace; margin: 10px 0; font-size: 0.9em; overflow-x: auto;">
                                 {finding['content']}
                             </div>
-                            <div style="background: #e8f8f5; color: #16a085; padding: 10px; border-radius: 4px; font-size: 0.95em; border: 1px solid #d1f2eb;">
-                                <strong>💡 Solución:</strong> {finding['remediation']}
+                            <div style="margin-top: 8px; color: #27ae60; font-size: 0.9em; font-weight: 600;">
+                                💡 {finding['remediation']}
                             </div>
                         </div>
                         """
-                    details_html += "</div>"
-                else:
-                    for call in details['dangerous_calls']:
-                        details_html += f"<div style='padding:5px;'>⚠️ {call}</div>"
-            
-            # Complexity
-            if details.get('complexity', 0) > 10:
-                details_html += f"<div style='margin-top:10px; padding:10px; background:#fff3cd; color:#856404; border-radius:4px;'>📉 <strong>Complejidad Ciclomática Alta:</strong> {details['complexity']} (Difícil de mantener)</div>"
-            # AST Depth
-            if details.get('ast_depth', 0) > 5:
-                details_html += f"<div style='margin-top:5px; padding:10px; background:#fff3cd; color:#856404; border-radius:4px;'>🌳 <strong>Profundidad de AST excesiva:</strong> {details['ast_depth']}</div>"
+                    else:
+                         details_html += f"<div>⚠️ {finding}</div>"
         
-        if not details_html and is_vuln:
-             details_html = "<div style='padding:15px; background:#e8f4f8; color:#2980b9; border-radius:4px;'>🤖 El modelo detectó patrones de riesgo basados en el texto del código (ML Prediction).</div>"
+        if not details_html:
+             details_html = "<div style='padding:15px; background:#e8f4f8; color:#2980b9; border-radius:4px;'>🤖 Riesgo detectado por predicción ML (Patrón complejo).</div>"
 
         html_content += f"""
-            <div class="finding-card {status_class}">
+            <div class="finding-card vulnerable">
                 <div class="card-header">
-                    <div class="card-title">{file_result['file']}</div>
+                    <div class="file-name">{file_result['file']}</div>
                     <div>
-                        <span style="margin-right: 10px; color: #7f8c8d;">Confianza: <strong>{prob}</strong></span>
-                        <span class="badge {badge_class}">{status_text}</span>
+                        <span style="margin-right: 15px; color: #7f8c8d; font-size: 0.9em;">Riesgo: <strong>{prob}</strong></span>
+                        <span class="badge badge-vuln">VULNERABLE</span>
                     </div>
                 </div>
                 <div class="card-body">
-                    {details_html if details_html else "<p style='color:#7f8c8d; font-style:italic;'>No se detectaron problemas específicos.</p>"}
+                    {details_html}
                 </div>
             </div>
         """
 
-    html_content += """
+    # Safe Files Section
+    html_content += f"""
+            <h2 class="section-title" style="color: #27ae60;">✅ Archivos Seguros ({len(safe_files_list)})</h2>
+            <table class="safe-table">
+                <thead>
+                    <tr>
+                        <th>Archivo</th>
+                        <th>Confianza</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+    """
+    
+    for file_result in safe_files_list:
+        html_content += f"""
+                    <tr>
+                        <td>{file_result['file']}</td>
+                        <td>{file_result.get('confidence', 0):.2%}</td>
+                        <td><span class="badge badge-safe">SEGURO</span></td>
+                    </tr>
+        """
+
+    # Scripts for Charts
+    html_content += f"""
+                </tbody>
+            </table>
         </div>
 
-        <footer>
-            Reporte generado el """ + timestamp + """ | Proyecto de Minería de Datos - ESPE
-        </footer>
+        <script>
+            // Files Chart
+            new Chart(document.getElementById('filesChart'), {{
+                type: 'doughnut',
+                data: {{
+                    labels: ['Vulnerables', 'Seguros'],
+                    datasets: [{{
+                        data: [{len(vulnerable_files_list)}, {len(safe_files_list)}],
+                        backgroundColor: ['#e74c3c', '#27ae60']
+                    }}]
+                }}
+            }});
+
+            // Vulnerabilities Chart
+            new Chart(document.getElementById('vulnChart'), {{
+                type: 'bar',
+                data: {{
+                    labels: {json.dumps(vuln_labels)},
+                    datasets: [{{
+                        label: 'Cantidad',
+                        data: {json.dumps(vuln_counts)},
+                        backgroundColor: '#3498db'
+                    }}]
+                }},
+                options: {{
+                    responsive: true,
+                    scales: {{
+                        y: {{ beginAtZero: true, ticks: {{ stepSize: 1 }} }}
+                    }}
+                }}
+            }});
+        </script>
     </body>
     </html>
     """
