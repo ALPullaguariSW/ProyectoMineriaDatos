@@ -75,6 +75,11 @@ def scan_directory(path, model, vectorizer):
             ext = os.path.splitext(file)[1]
             if ext in extensions:
                 filepath = os.path.join(root, file)
+                
+                # Whitelist internal files
+                if any(w in filepath for w in ["data_loader.py", "external_data.py", "test_cases"]):
+                    continue
+                    
                 try:
                     pred, prob, details = predict_file(filepath, model, vectorizer)
                     status = "VULNERABLE" if pred == 1 else "SAFE"
