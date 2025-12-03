@@ -77,7 +77,7 @@ def scan_directory(path, model, vectorizer):
                 filepath = os.path.join(root, file)
                 
                 # Whitelist internal files
-                if any(w in filepath for w in ["data_loader.py", "external_data.py", "test_cases", "train_model.py"]):
+                if any(w in filepath for w in ["data_loader.py", "external_data.py", "test_cases", "train_model.py", "scan_repo.py"]):
                     continue
                     
                 try:
