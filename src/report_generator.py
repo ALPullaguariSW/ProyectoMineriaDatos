@@ -30,6 +30,32 @@ def generate_html_report(scan_results_file="scan_report.json", shap_image_path="
     scan_duration = results.get("scan_duration", "N/A")
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
+    # --- Calculate Statistics for Dashboard ---
+    vuln_types = {}
+    vulnerable_files_list = []
+    safe_files_list = []
+
+    for res in results.get("results", []):
+        if res.get('status') == 'VULNERABLE':
+            vulnerable_files_list.append(res)
+            # Count types
+            if res.get('details') and isinstance(res['details'].get('dangerous_calls'), list):
+                for finding in res['details']['dangerous_calls']:
+                    if isinstance(finding, dict):
+                        v_type = finding['type']
+                        vuln_types[v_type] = vuln_types.get(v_type, 0) + 1
+                    else:
+                        # Fallback for old string format
+                        vuln_types['Generic Risk'] = vuln_types.get('Generic Risk', 0) + 1
+            else:
+                 vuln_types['ML Predicted Risk'] = vuln_types.get('ML Predicted Risk', 0) + 1
+        else:
+            safe_files_list.append(res)
+
+    # Prepare data for JS
+    vuln_labels = list(vuln_types.keys())
+    vuln_counts = list(vuln_types.values())
+
     # HTML Template (Embedded for simplicity)
     html_content = f"""
     <!DOCTYPE html>
