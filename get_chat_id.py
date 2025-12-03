@@ -1,7 +1,10 @@
 import requests
 import time
 
-TOKEN = "7687532927:AAFb5eLRAFrszRJOpPwIzlZ2P4GoFdU1RxA"
+import os
+
+# DO NOT HARDCODE TOKENS IN PUBLIC REPOSITORIES
+TOKEN = input("Ingresa tu Telegram Bot Token: ")
 URL = f"https://api.telegram.org/bot{TOKEN}/getUpdates"
 
 def get_chat_id():
