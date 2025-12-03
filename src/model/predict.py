@@ -66,7 +66,7 @@ import time
 def scan_directory(path, model, vectorizer):
     """Recursively scans a directory for vulnerabilities."""
     results = []
-    extensions = {".py", ".java", ".c", ".cpp", ".h", ".js"}
+    extensions = {".py", ".java", ".c", ".cpp", ".h", ".js", ".cs", ".go", ".rb", ".swift", ".ts", ".tsx"}
     ignore_dirs = {".git", "__pycache__", "node_modules", "venv", ".idea", ".vscode"}
     
     print(f"Scanning directory: {path}")
@@ -137,10 +137,18 @@ def main():
     
     if os.path.isfile(args.path):
         print(f"Scanning single file: {args.path}")
-        pred, prob = predict_file(args.path, model, vectorizer)
+        pred, prob, details = predict_file(args.path, model, vectorizer)
         status = "VULNERABLE" if pred == 1 else "SAFE"
         color = "\033[91m" if pred == 1 else "\033[92m"
         print(f"{color}[{status}] {args.path} (Confidence: {prob:.2f})\033[0m")
+        
+        if status == "VULNERABLE" and details['dangerous_calls']:
+            print("  ⚠️  Findings:")
+            for finding in details['dangerous_calls']:
+                if isinstance(finding, dict):
+                    print(f"    - [Line {finding['line']}] {finding['type']} ({finding.get('cwe', 'N/A')}): {finding['description']}")
+                else:
+                    print(f"    - {finding}")
     elif os.path.isdir(args.path):
         results = scan_directory(args.path, model, vectorizer)
         vuln_count = sum(1 for r in results if r['status'] == 'VULNERABLE')

@@ -245,7 +245,11 @@ def generate_html_report(scan_results_file="scan_report.json", shap_image_path="
                         details_html += f"""
                         <div class="finding-detail {severity_class}">
                             <div class="finding-header">
-                                <span class="finding-type">{finding['type']}</span>
+                                <div>
+                                    <span class="finding-type">{finding['type']}</span>
+                                    <span class="line-badge" style="background: #34495e; margin-left: 10px;">{finding.get('cwe', 'N/A')}</span>
+                                    <span class="line-badge" style="background: #8e44ad; margin-left: 5px;">{finding.get('owasp', 'N/A')}</span>
+                                </div>
                                 <span class="line-badge">Línea {finding['line']}</span>
                             </div>
                             <p style="margin: 0 0 10px 0;">{finding['description']}</p>

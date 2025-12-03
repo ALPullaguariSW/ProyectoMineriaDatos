@@ -121,125 +121,237 @@ def get_dangerous_details(code):
         # --- C/C++ ---
         r'strcpy\(': {
             "type": "Buffer Overflow", "severity": "High",
+            "cwe": "CWE-120", "owasp": "A03:2021-Injection",
             "desc": "La función 'strcpy' no verifica la longitud del buffer destino.",
             "fix": "Use 'strncpy' o funciones seguras como 'strcpy_s'."
         },
         r'gets\(': {
             "type": "Buffer Overflow", "severity": "Critical",
+            "cwe": "CWE-242", "owasp": "A03:2021-Injection",
             "desc": "La función 'gets' es inherentemente insegura y obsoleta.",
             "fix": "Reemplácela con 'fgets'."
         },
         r'system\(': {
             "type": "Command Injection", "severity": "High",
+            "cwe": "CWE-78", "owasp": "A03:2021-Injection",
             "desc": "Ejecutar comandos del sistema operativo puede permitir inyección de comandos.",
             "fix": "Evite 'system'. Use APIs específicas del lenguaje o valide estrictamente la entrada."
         },
-        
+        r'sprintf\(': {
+            "type": "Buffer Overflow", "severity": "Medium",
+            "cwe": "CWE-134", "owasp": "A03:2021-Injection",
+            "desc": "Uso de sprintf sin control de longitud.",
+            "fix": "Use 'snprintf' para limitar el tamaño del buffer."
+        },
+
         # --- Python ---
         r'eval\(': {
             "type": "Code Injection", "severity": "Critical",
+            "cwe": "CWE-95", "owasp": "A03:2021-Injection",
             "desc": "'eval' ejecuta código arbitrario. Si la entrada es controlada por el usuario, es fatal.",
             "fix": "Use 'ast.literal_eval' para evaluar estructuras de datos seguras."
         },
         r'exec\(': {
             "type": "Code Injection", "severity": "Critical",
+            "cwe": "CWE-95", "owasp": "A03:2021-Injection",
             "desc": "'exec' ejecuta código Python dinámicamente.",
             "fix": "Evite la ejecución dinámica de código. Reestructure la lógica."
         },
         r'pickle\.load': {
             "type": "Insecure Deserialization", "severity": "High",
+            "cwe": "CWE-502", "owasp": "A08:2021-Software and Data Integrity Failures",
             "desc": "Pickle es inseguro contra datos maliciosos.",
             "fix": "Use formatos seguros como JSON ('json.load') para serializar datos."
         },
         r'subprocess\.call\(.*shell=True': {
             "type": "Command Injection", "severity": "High",
+            "cwe": "CWE-78", "owasp": "A03:2021-Injection",
             "desc": "Usar 'shell=True' en subprocess abre brechas de seguridad.",
             "fix": "Establezca 'shell=False' y pase los argumentos como una lista."
         },
+        r'yaml\.load\(': {
+            "type": "Insecure Deserialization", "severity": "High",
+            "cwe": "CWE-502", "owasp": "A08:2021-Software and Data Integrity Failures",
+            "desc": "yaml.load es inseguro por defecto en versiones antiguas de PyYAML.",
+            "fix": "Use 'yaml.safe_load'."
+        },
 
-        # --- JavaScript / Node.js ---
+        # --- JavaScript / Node.js / TypeScript ---
         r'innerHTML': {
             "type": "XSS (Cross-Site Scripting)", "severity": "Medium",
+            "cwe": "CWE-79", "owasp": "A03:2021-Injection",
             "desc": "Asignar directamente a 'innerHTML' puede permitir inyección de scripts.",
             "fix": "Use 'textContent' o bibliotecas de sanitización como DOMPurify."
         },
         r'document\.write': {
             "type": "XSS / Performance", "severity": "Medium",
+            "cwe": "CWE-79", "owasp": "A03:2021-Injection",
             "desc": "'document.write' es inseguro y bloquea el renderizado.",
             "fix": "Use manipulación segura del DOM (e.g., 'appendChild')."
         },
-        
+        r'dangerouslySetInnerHTML': {
+            "type": "XSS (React)", "severity": "High",
+            "cwe": "CWE-79", "owasp": "A03:2021-Injection",
+            "desc": "Uso explícito de inyección HTML en React.",
+            "fix": "Evite su uso o sanitice la entrada con DOMPurify."
+        },
+        r'eval\(': {
+            "type": "Code Injection", "severity": "Critical",
+            "cwe": "CWE-95", "owasp": "A03:2021-Injection",
+            "desc": "Eval ejecuta código arbitrario en JS.",
+            "fix": "Evite eval. Use JSON.parse o alternativas seguras."
+        },
+
         # --- Java ---
         r'Runtime\.getRuntime\(\)\.exec': {
             "type": "Command Injection", "severity": "High",
+            "cwe": "CWE-78", "owasp": "A03:2021-Injection",
             "desc": "Ejecución directa de comandos del sistema.",
             "fix": "Use 'ProcessBuilder' y evite pasar argumentos sin validar."
         },
         r'(?i)Statement\s*=\s*.*createStatement': {
             "type": "SQL Injection Risk", "severity": "Medium",
+            "cwe": "CWE-89", "owasp": "A03:2021-Injection",
             "desc": "El uso de 'Statement' puede llevar a inyecciones SQL si se concatenan parámetros.",
             "fix": "Use 'PreparedStatement' con parámetros '?'."
         },
         r'(?i)\.executeQuery\s*\(.*[\+]': {
             "type": "SQL Injection", "severity": "Critical",
+            "cwe": "CWE-89", "owasp": "A03:2021-Injection",
             "desc": "Concatenación detectada en consulta SQL.",
             "fix": "Use 'PreparedStatement' para evitar inyecciones SQL."
         },
         r'MessageDigest\.getInstance\(\"MD5\"\)': {
             "type": "Weak Cryptography", "severity": "Medium",
+            "cwe": "CWE-327", "owasp": "A02:2021-Cryptographic Failures",
             "desc": "MD5 es un algoritmo de hash obsoleto.",
             "fix": "Use SHA-256 o superior."
         },
         r'new\s+Random\(\)': {
             "type": "Insecure Randomness", "severity": "Low",
+            "cwe": "CWE-330", "owasp": "A02:2021-Cryptographic Failures",
             "desc": "'java.util.Random' no es criptográficamente seguro.",
             "fix": "Use 'java.security.SecureRandom' para tokens o claves."
         },
-        r'System\.out\.print': {
-            "type": "Sensitive Data Exposure", "severity": "Low",
-            "desc": "El uso de 'System.out' puede exponer información sensible en los logs.",
-            "fix": "Use un logger configurado (SLF4J, Log4j) con niveles adecuados."
+
+        # --- C# (.NET) ---
+        r'SqlCommand\s*\(.*[\+]': {
+            "type": "SQL Injection", "severity": "Critical",
+            "cwe": "CWE-89", "owasp": "A03:2021-Injection",
+            "desc": "Concatenación de cadenas en comandos SQL.",
+            "fix": "Use 'SqlParameter' para parametrizar consultas."
         },
-        r'printStackTrace\(\)': {
-            "type": "Information Leakage", "severity": "Low",
-            "desc": "Imprimir el stack trace expone detalles internos de la aplicación.",
-            "fix": "Loguee la excepción de forma controlada."
+        r'Unsafe\.': {
+            "type": "Unsafe Code", "severity": "Medium",
+            "cwe": "CWE-111", "owasp": "A05:2021-Security Misconfiguration",
+            "desc": "Uso de código no gestionado/inseguro en C#.",
+            "fix": "Evite bloques 'unsafe' a menos que sea estrictamente necesario."
         },
-        
+        r'ValidateInput\s*=\s*false': {
+            "type": "XSS Protection Disabled", "severity": "High",
+            "cwe": "CWE-79", "owasp": "A03:2021-Injection",
+            "desc": "Deshabilitar la validación de entrada en ASP.NET permite XSS.",
+            "fix": "Habilite la validación de entrada."
+        },
+
+        # --- Go (Golang) ---
+        r'fmt\.Sprintf\(.*SELECT': {
+            "type": "SQL Injection", "severity": "High",
+            "cwe": "CWE-89", "owasp": "A03:2021-Injection",
+            "desc": "Construcción de consultas SQL con Sprintf.",
+            "fix": "Use argumentos posicionales ($1, $2) en 'db.Query'."
+        },
+        r'os\.Exec': {
+            "type": "Command Injection", "severity": "High",
+            "cwe": "CWE-78", "owasp": "A03:2021-Injection",
+            "desc": "Ejecución de comandos del sistema.",
+            "fix": "Valide estrictamente la entrada antes de pasarla a os.Exec."
+        },
+        r'unsafe\.Pointer': {
+            "type": "Memory Safety", "severity": "Medium",
+            "cwe": "CWE-119", "owasp": "A05:2021-Security Misconfiguration",
+            "desc": "Uso de punteros inseguros en Go.",
+            "fix": "Evite el paquete 'unsafe' para garantizar la seguridad de memoria."
+        },
+
+        # --- Ruby ---
+        r'eval\(': {
+            "type": "Code Injection", "severity": "Critical",
+            "cwe": "CWE-95", "owasp": "A03:2021-Injection",
+            "desc": "Ejecución dinámica de código en Ruby.",
+            "fix": "Evite 'eval'. Use alternativas seguras."
+        },
+        r'system\(': {
+            "type": "Command Injection", "severity": "High",
+            "cwe": "CWE-78", "owasp": "A03:2021-Injection",
+            "desc": "Ejecución de comandos del sistema.",
+            "fix": "Use 'exec' con lista de argumentos, no string."
+        },
+        r'params\[:.*\]\.html_safe': {
+            "type": "XSS Risk", "severity": "High",
+            "cwe": "CWE-79", "owasp": "A03:2021-Injection",
+            "desc": "Marcar entrada de usuario como 'html_safe' permite XSS.",
+            "fix": "Nunca use 'html_safe' en entrada de usuario sin sanitizar."
+        },
+
         # --- PHP ---
         r'shell_exec\(': {
             "type": "Command Injection", "severity": "High",
+            "cwe": "CWE-78", "owasp": "A03:2021-Injection",
             "desc": "Ejecuta comandos en el servidor.",
             "fix": "Deshabilite esta función en php.ini si no es necesaria."
         },
+        r'eval\(': {
+            "type": "Code Injection", "severity": "Critical",
+            "cwe": "CWE-95", "owasp": "A03:2021-Injection",
+            "desc": "Ejecución de código PHP arbitrario.",
+            "fix": "Evite 'eval' a toda costa."
+        },
+        r'mysql_query\(': {
+            "type": "SQL Injection / Deprecated", "severity": "High",
+            "cwe": "CWE-89", "owasp": "A03:2021-Injection",
+            "desc": "Funciones 'mysql_*' están obsoletas e inseguras.",
+            "fix": "Use PDO o MySQLi con Prepared Statements."
+        },
 
-        # --- Cryptography ---
+        # --- Cryptography (General) ---
         r'MD5\(': {
             "type": "Weak Cryptography", "severity": "Medium",
+            "cwe": "CWE-327", "owasp": "A02:2021-Cryptographic Failures",
             "desc": "MD5 está roto y es vulnerable a colisiones.",
             "fix": "Use algoritmos modernos como SHA-256 o SHA-3."
         },
         r'AES/ECB': {
             "type": "Weak Encryption Mode", "severity": "High",
+            "cwe": "CWE-327", "owasp": "A02:2021-Cryptographic Failures",
             "desc": "El modo ECB no oculta patrones en los datos.",
             "fix": "Use modos autenticados como AES-GCM o AES-CBC con IV aleatorio."
         },
 
-        # --- Secrets ---
+        # --- Secrets (General) ---
         r'(?i)api_key\s*=\s*[\'"][a-zA-Z0-9_\-]{20,}[\'"]': {
             "type": "Hardcoded Secret", "severity": "Critical",
+            "cwe": "CWE-798", "owasp": "A07:2021-Identification and Authentication Failures",
             "desc": "Parece haber una API Key hardcodeada en el código.",
             "fix": "Mueva las credenciales a variables de entorno o un gestor de secretos."
         },
         r'(?i)password\s*=\s*[\'"][^\'"]+[\'"]': {
             "type": "Hardcoded Password", "severity": "High",
+            "cwe": "CWE-798", "owasp": "A07:2021-Identification and Authentication Failures",
             "desc": "Contraseña en texto plano detectada.",
             "fix": "Nunca guarde contraseñas en el código fuente."
         },
+        r'-----BEGIN PRIVATE KEY-----': {
+            "type": "Private Key Leak", "severity": "Critical",
+            "cwe": "CWE-312", "owasp": "A07:2021-Identification and Authentication Failures",
+            "desc": "Clave privada RSA/DSA detectada en el código.",
+            "fix": "Elimine la clave inmediatamente y rótela."
+        },
         
-        # --- SQL Injection ---
+        # --- SQL Injection (General) ---
         r'(?i)(SELECT|INSERT|UPDATE|DELETE).*(\+.*\w|\w.*\+)': {
             "type": "SQL Injection", "severity": "High",
+            "cwe": "CWE-89", "owasp": "A03:2021-Injection",
             "desc": "Concatenación de cadenas en consultas SQL.",
             "fix": "Use consultas parametrizadas (Prepared Statements) o un ORM."
         }
@@ -254,6 +366,8 @@ def get_dangerous_details(code):
                     "content": line.strip()[:100], # Truncate long lines
                     "type": info["type"],
                     "severity": info["severity"],
+                    "cwe": info.get("cwe", "N/A"),
+                    "owasp": info.get("owasp", "N/A"),
                     "description": info["desc"],
                     "remediation": info["fix"]
                 })
