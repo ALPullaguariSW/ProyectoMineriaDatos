@@ -7,10 +7,10 @@ import sys
 # Add project root to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from src.data_loader import load_data, generate_synthetic_data
-from src.preprocessing import clean_code, preprocess_data, extract_features
-from src.train_model import train_models
-from src.predict import predict_file
+from src.sample.data_loader import load_data, generate_synthetic_data
+from src.modify.preprocessing import clean_code, preprocess_data, extract_features
+from src.model.train_model import train_models
+from src.model.predict import predict_file
 
 def test_clean_code():
     raw_code = "int main() { // comment \n return 0; }"

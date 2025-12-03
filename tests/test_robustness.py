@@ -4,8 +4,8 @@ import os
 # Add project root to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from src.predict import predict_file
-from src.preprocessing import clean_code
+from src.model.predict import predict_file
+from src.modify.preprocessing import clean_code
 
 # Mock model and vectorizer for testing without loading full files
 class MockModel:
