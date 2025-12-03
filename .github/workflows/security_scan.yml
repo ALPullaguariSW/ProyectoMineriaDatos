@@ -30,17 +30,17 @@ jobs:
 
     - name: 🚀 Notify Pipeline Start
       if: always()
-      run: python src/notifications.py "🚀 Pipeline Started for commit ${{ github.sha }}"
+      run: python src/assess/notifications.py "🚀 Pipeline Started for commit ${{ github.sha }}"
 
     - name: 🧠 Train Model (Simulation)
       run: |
-        python src/data_loader.py
-        python src/train_model.py
+        python src/sample/data_loader.py
+        python src/model/train_model.py
 
     - name: 🛡️ Security Scan (Phase 1)
       id: scan
       run: |
-        python src/predict.py src/ > scan_output.txt
+        python src/model/predict.py src/ > scan_output.txt
         cat scan_output.txt
         if grep -q "\[VULNERABLE\]" scan_output.txt; then
           echo "Vulnerabilities found!"
@@ -50,8 +50,8 @@ jobs:
     - name: 📊 Generate Explanations (SHAP & HTML)
       if: success() || failure() # Run even if scan fails to generate report
       run: |
-        python src/explain.py
-        python src/report_generator.py
+        python src/assess/explain.py
+        python src/assess/report_generator.py
         
     - name: 📤 Upload Reports
       if: success() || failure()
@@ -65,11 +65,11 @@ jobs:
 
     - name: ❌ Notify Scan Failure
       if: failure() && steps.scan.outcome == 'failure'
-      run: python src/notifications.py "❌ Security Alert! Vulnerabilities detected in the codebase. Pipeline blocked."
+      run: python src/assess/notifications.py "❌ Security Alert! Vulnerabilities detected in the codebase. Pipeline blocked."
 
     - name: ✅ Notify Scan Success
       if: success()
-      run: python src/notifications.py "✅ Security Scan Passed. No vulnerabilities found."
+      run: python src/assess/notifications.py "✅ Security Scan Passed. No vulnerabilities found."
 
     - name: 🧪 Unit Tests (Phase 2)
       run: |
@@ -80,4 +80,4 @@ jobs:
       run: |
         echo "Deploying to production..."
         # Add actual deployment commands here (e.g., docker push)
-        python src/notifications.py "🚀 Deployment Successful! API is live."
+        python src/assess/notifications.py "🚀 Deployment Successful! API is live."
