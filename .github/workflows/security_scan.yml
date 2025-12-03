@@ -47,19 +47,21 @@ jobs:
           exit 1
         fi
 
-    - name: 📊 Generate Explanations (SHAP)
-      if: success()
+    - name: 📊 Generate Explanations (SHAP & HTML)
+      if: success() || failure() # Run even if scan fails to generate report
       run: |
         python src/explain.py
+        python src/report_generator.py
         
     - name: 📤 Upload Reports
-      if: success()
+      if: success() || failure()
       uses: actions/upload-artifact@v4
       with:
         name: security-reports
         path: |
           scan_report.json
           reports/figures/shap_summary.png
+          security_report.html
 
     - name: ❌ Notify Scan Failure
       if: failure() && steps.scan.outcome == 'failure'
