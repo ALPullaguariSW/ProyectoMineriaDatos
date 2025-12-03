@@ -1,0 +1,300 @@
+
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Reporte de Seguridad de Software - Proyecto Minería de Datos</title>
+        <style>
+            :root {
+                --primary: #2c3e50;
+                --secondary: #34495e;
+                --accent: #3498db;
+                --danger: #e74c3c;
+                --success: #27ae60;
+                --warning: #f39c12;
+                --light: #ecf0f1;
+                --dark: #2c3e50;
+                --bg: #f4f7f6;
+                --card-bg: #ffffff;
+                --text: #333333;
+                --text-muted: #7f8c8d;
+                --border: #e0e0e0;
+                --shadow: 0 4px 6px rgba(0,0,0,0.05);
+                --shadow-hover: 0 8px 15px rgba(0,0,0,0.1);
+                --radius: 12px;
+            }
+
+            body { font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif; margin: 0; padding: 0; background-color: var(--bg); color: var(--text); line-height: 1.6; }
+            
+            /* Header */
+            header { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; padding: 40px 20px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.15); margin-bottom: 40px; }
+            header h1 { margin: 0; font-size: 2.8em; font-weight: 700; letter-spacing: -0.5px; }
+            .subtitle { opacity: 0.9; margin-top: 10px; font-size: 1.2em; font-weight: 300; }
+            
+            /* Layout */
+            .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+            
+            /* Stats Grid */
+            .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 25px; margin-bottom: 40px; }
+            .stat-card { background: var(--card-bg); padding: 25px; border-radius: var(--radius); text-align: center; box-shadow: var(--shadow); transition: transform 0.2s ease; border: 1px solid var(--border); }
+            .stat-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-hover); }
+            .stat-number { font-size: 3em; font-weight: 800; line-height: 1; margin-bottom: 10px; }
+            .stat-label { color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.85em; letter-spacing: 1px; }
+            
+            /* Charts Grid */
+            .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 30px; margin-bottom: 50px; }
+            .chart-card { background: var(--card-bg); padding: 30px; border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--border); }
+            .chart-card h3 { margin-top: 0; color: var(--primary); font-size: 1.3em; border-bottom: 2px solid var(--light); padding-bottom: 15px; margin-bottom: 20px; }
+            
+            /* Section Titles */
+            .section-title { display: flex; align-items: center; gap: 15px; margin: 60px 0 30px; color: var(--primary); font-size: 2em; font-weight: 700; }
+            .section-title::after { content: ''; flex: 1; height: 2px; background: var(--border); margin-left: 20px; opacity: 0.5; }
+            
+            /* Finding Cards */
+            .finding-card { background: var(--card-bg); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 30px; overflow: hidden; border: 1px solid var(--border); transition: all 0.3s ease; }
+            .finding-card:hover { box-shadow: var(--shadow-hover); transform: translateY(-2px); }
+            .finding-card.vulnerable { border-top: 6px solid var(--danger); }
+            .finding-card.safe { border-top: 6px solid var(--success); }
+            
+            .card-header { padding: 20px 25px; background: #fcfcfc; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+            .file-name { font-size: 1.3em; font-weight: 700; color: var(--primary); font-family: 'Consolas', 'Monaco', monospace; }
+            
+            .card-body { padding: 25px; }
+            
+            /* Detailed Findings */
+            .finding-detail { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin-bottom: 20px; border-left: 5px solid var(--warning); box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+            .finding-detail.critical { border-left-color: var(--danger); }
+            .finding-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+            .finding-type { font-weight: 800; font-size: 1.1em; color: var(--danger); }
+            .line-badge { background: var(--secondary); color: white; padding: 4px 10px; border-radius: 6px; font-size: 0.85em; font-weight: 600; }
+            
+            .code-block { background: #282c34; color: #abb2bf; padding: 15px; border-radius: 6px; font-family: 'Consolas', monospace; font-size: 0.9em; overflow-x: auto; margin: 15px 0; border: 1px solid #1e2127; }
+            .remediation-box { background: #f0fdf4; color: #166534; padding: 15px; border-radius: 6px; border: 1px solid #bbf7d0; font-size: 0.95em; display: flex; gap: 10px; align-items: start; }
+            
+            /* Badges */
+            .badge { padding: 8px 16px; border-radius: 30px; font-size: 0.85em; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; display: inline-block; }
+            .badge-vuln { background-color: #fce8e6; color: var(--danger); border: 1px solid #fad2cf; }
+            .badge-safe { background-color: #e6f4ea; color: var(--success); border: 1px solid #ceead6; }
+            
+            /* Safe Table */
+            .safe-table-container { background: var(--card-bg); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; border: 1px solid var(--border); }
+            .safe-table { width: 100%; border-collapse: collapse; }
+            .safe-table th { background: #f8f9fa; padding: 18px 25px; text-align: left; color: var(--text-muted); font-weight: 700; text-transform: uppercase; font-size: 0.85em; letter-spacing: 0.5px; border-bottom: 2px solid var(--border); }
+            .safe-table td { padding: 18px 25px; border-bottom: 1px solid var(--border); color: var(--text); font-size: 0.95em; }
+            .safe-table tr:last-child td { border-bottom: none; }
+            .safe-table tr:hover td { background-color: #f8f9fa; }
+            
+            /* SHAP */
+            .shap-container { text-align: center; margin: 30px 0; }
+            .shap-img { max-width: 100%; border-radius: 8px; box-shadow: var(--shadow); border: 1px solid var(--border); }
+            .shap-guide { background: #f0f9ff; padding: 25px; border-radius: var(--radius); border: 1px solid #bae6fd; margin-top: 30px; }
+            .shap-guide h3 { color: #0369a1; margin-top: 0; font-size: 1.2em; }
+            
+            footer { text-align: center; padding: 40px; color: var(--text-muted); font-size: 0.9em; border-top: 1px solid var(--border); margin-top: 60px; }
+            
+            @media (max-width: 768px) {
+                .stats-row { grid-template-columns: 1fr 1fr; }
+                .dashboard-grid { grid-template-columns: 1fr; }
+                .card-header { flex-direction: column; align-items: flex-start; }
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <h1>🛡️ Dashboard de Seguridad</h1>
+            <div class="subtitle">Análisis Automatizado de Vulnerabilidades</div>
+        </header>
+
+        <div class="container">
+            
+            <!-- Key Metrics Row -->
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-number" style="color: #e74c3c">5</div>
+                    <div class="stat-label">Archivos Críticos</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" style="color: #27ae60">2</div>
+                    <div class="stat-label">Archivos Seguros</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" style="color: #3498db">1</div>
+                    <div class="stat-label">Tipos de Riesgo</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">0s</div>
+                    <div class="stat-label">Duración</div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="dashboard-grid">
+                <div class="chart-card">
+                    <h3 style="text-align:center; margin-bottom:15px;">Distribución de Archivos</h3>
+                    <canvas id="filesChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3 style="text-align:center; margin-bottom:15px;">Top Vulnerabilidades</h3>
+                    <canvas id="vulnChart"></canvas>
+                </div>
+            </div>
+
+            <!-- SHAP Section -->
+            <h2 class="section-title">🧠 Análisis de Inteligencia Artificial</h2>
+            <div class="chart-card">
+                <div style="text-align: center;">
+                    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAZAAAAKoCAYAAABZfqmRAAAAOnRFWHRTb2Z0d2FyZQBNYXRwbG90bGliIHZlcnNpb24zLjEwLjcsIGh0dHBzOi8vbWF0cGxvdGxpYi5vcmcvTLEjVAAAAAlwSFlzAAAPYQAAD2EBqD+naQAAKldJREFUeJzt3Qe4HWWZB/DvplISQofQWYqFpXeklwiCgBCqBaM0AZFdG4usoCDgwoLSlKJBRVdElGahCYoNBCmJESkLCiGYBAiQkJByZ5933HO99+amvUluy+/3PCcnZ86cOTNz5s5/vjIzTVVVVQUAFlCfBf0AAAgQANKUQABIESAApAgQAFIECAApAgSAFAECQIoAASBFgADd2tlnn12amprKxIkTF9k0//CHP5SddtqpLLvssvW0H3300Xr4z3/+87LFFluUpZZaqh4+adKkRfadvZEAoUtMnjy5nHXWWWXfffctK664Yv3Het1113U47p///Od6vEGDBtXjfvCDHywTJkzo9Hmmd5gxY0Y57LDDyiuvvFIuueSS8p3vfKesu+665eWXXy6HH354WXrppcsVV1xRD4+AYc76zeU9WGziaPKLX/xiWWeddcrmm29e7rvvvg7He+GFF8quu+5ahgwZUs4777w6eC666KIyatSo8uCDD5YBAwb4lVggzzzzTPnrX/9arrnmmnLssce2DI/SxxtvvFHOOeecsvfee1ur80GA0CWGDh1axo0bV1ZfffXy0EMPlW233bbD8SI0pkyZUh5++OE6bMJ2221X9tlnn7rEcvzxx3fynNPTjR8/vn5efvnl52v4wpgyZUqvLsWowqJLDBw4sA6PebnpppvKAQcc0BIeIY4ON9544/KDH/xgMc8l3a3UGlVMyy23XFlppZXKJz7xiTJt2rT6veeee26O1aAxPNpRwoc//OGy22671f+Paqx4b/fdd68fxxxzTD08DmZieIzb8MADD9TVqFESXmaZZepp/OY3v+mwrWbMmDHl6KOPLiussELZeeedS2+mBEK3NXbs2PqocJtttpntvSiF/PSnP+2S+aJrRHist9565fzzzy+///3vy6WXXlpeffXV8u1vf3u+p3HCCSeUNddcsy7ZnnrqqXVYrLbaavV7b3vb28rVV19dV62uv/76ZYMNNqiH/+IXvyj77bdf2Xrrret2uz59+pSRI0eWPffcs9x///31tthaBNNGG21Uf0dvv1uGAKHbiiquRnVXezEsGkHfeuutujRD7xc79VtuuaX+/8knn1yXRK688sryqU99qv7//Nhxxx3rbSZ27rvssksZPnx4mwOWCJAIi8ZBSwTAiSeeWPbYY4/ys5/9rC5hNIJok002KWeeeWa5884723xHtOl973vfK0sCVVh0W1OnTq2fOwqI6GbZehx6vwiN1j7+8Y/Xz4uzJBrde5966qm6Sip6aUU1WjyibWOvvfYqv/rVr0pzc3Obz0TgLCmUQOi2ojtliCPG9hp1341x6P2iWqi1qGKK6qRo/1hcIjxCo32kI6+99lrd3tG6pLSkECB0W42qq0ZVVmsxLM4JUX215GpUJ7X/f2uzZs1aqO9olC4uvPDC+gTDjgwaNKjN6yXpoEaA0G1FY+cqq6xSd/NtL84BmdMfNL1TlAZaH90//fTT9Q4+GtYbJYD2Z47H+R4Lo9GQHm0szg2ZnTYQurVDDz203H777eX5559vGXbPPfeUJ598su7twpIjzg5v7bLLLqufo9E7dvArr7xy3SbRWjSyL4zoeRUhEievxkms7U1Ywq+IoARCl7n88svrI8YXX3yxfn3bbbfVZ543Gkijz/0ZZ5xRbrzxxroXTPT7jz/iqE7YdNNNy4gRI/x6S5Bnn322HHjggfX5GL/73e/K9ddfXzduR6+nEGeVX3DBBfVz9KKKMIkDjYURbSzXXnttHVLR6yq2uSgZR4+te++9tw6u2G6XWBV0kXXXXTc6yXf4ePbZZ1vGGz16dDVs2LBqmWWWqZZffvnq/e9/f/XSSy/53ZYQZ511Vr1NjBkzpho+fHg1ePDgaoUVVqhOOeWUaurUqS3jvfnmm9VHP/rRasiQIfU4hx9+eDV+/Pj6szGNhnvvvbceduONN7b5npEjR9bD//CHP8w2D4888kh1yCGHVCuttFI1cODAets9/PDDq3vuuWe2+ZwwYUK1pGiKf7o6xADoebSBAJAiQABIESAApAgQAFIECAApAgSAFAECQIoz0el2ZsyYUd+wJ8SZv/379+/qWaIXsp0tPCUQAFIECAApAgSAFAECQIoAASBFgACQIkAASBEgAKQIEABSBAgAKQIEgBQBAkCKAAEgRYAAkCJAAEgRIACkCBAAUgQIACkCBIAUAQJAigABIEWAAJAiQABIESAApAgQAFIECAApAgSAFAECQIoAASBFgACQIkAASBEgAKQIEABSBAgAKQIEgBQBAkCKAAEgRYAAkCJAAEgRIACkCBAAUgQIACkCBIAUAQJAigABIEWAAJAiQABIESAApAgQAFIECAApAgSAFAECQIoAASBFgACQIkAASBEgAKQIEABSBAgAKQIEgBQBAkCKAAEgRYAAkCJAAEgRIACkCBAAUgQIACkCBIAUAQJAigABIEWAAJAiQABIESAApAgQAFIECAApAgSAFAECQIoAASBFgACQIkAASBEgAKQIEABSBAgAKQIEgBQBAkCKAAEgRYAAkCJAAEgRIACkCBAAUgQIACkCBIAUAQJAigABIEWAAJAiQABIESAApAgQAFIECAApAgSAFAECQIoAASBFgACQIkAASBEgAKQIEABSBAgAKQIEgBQBAkCKAAEgRYAAkCJAAEgRIACkCBAAUgQIACkCBIAUAQJAigABIEWAAJAiQABIESAApAgQAFIECAApAgSAFAECQIoAASBFgACQIkAASBEgAKQIEABSBAgAKQIEgBQBAkCKAAEgRYAAkCJAAEgRIACkCBAAUgQIACkCBIAUAQJAigABIEWAAJAiQABIESAApAgQAFIECAApAgSAFAECQIoAASBFgACQIkAASBEgAKQIEABSBAgAKQIEgBQBAkCKAAEgRYDQ5Sa8WZUfPdlcHp9QdfWssAR59rVSHp6xXpnYPKirZ6XH6tfVM8CS7cdPNZejf9Jcps38x+sR/9pUrtqrq+eK3u7CB5vL6feX0lztWZpKcykPlXLGjl09Vz2PEghdZmZzVU6++5/hEUaOrsqvXvCjsPi8NKUqn/t1c2mumurXVelTzvpdKS9OVgJeUAKELvPy1FLGTZl9+KiJXTE3LCn+/HJVZjS3HTazuakezoIRIHSZVZcpZaMVZh++0xpdMTcsKbZctaks067yful+VdlqtX+USJh/AoQu09TUVL61X9+yxv+3YQ7sW8q5O/cpW67qR2HxWX6ppvKNffuUIQP+UeJYurxVrtq7lBWWEiALSiM6XWrHNZrKX4/vW0ZPLGXtwaWstHRTmTFjll+FxerIt/cp+64zq1z0rZvLan1eL0e+7YPWeIIAocv169NUtlDqoJMt27+Udfq+Yr0vBFVYAKQIEABSBAgAKQIEgBQBAkCKAAEgRYAAkCJAAEgRIACkCBAAUgQIACkCBIAUAQJAigABIEWAAJAiQABIESAApAgQAFIECAApAgSAFAECQIoAASBFgACQIkAASBEgAKT0Kz3IyJEjyxNPPFE/xo4dW4YOHVpuu+22OY4/evTocuWVV9bPTU1NZbPNNiunnHJKedvb3tap8w3QG/WoEsgVV1xRHnroobLmmmuW5ZZbbq7jjho1qhx//PF10Jxwwgn1///2t7+V4447rjz99NOdNs8AvVWPKoHcfPPNZa211qr/f/jhh5epU6fOcdwLL7yw9O/fv1xzzTVl1VVXrYfts88+5bDDDiuXXHJJHUYALCElkEZ4zMvzzz9fxowZU/baa6+W8Ajx/xj24IMPlokTJy7GOWV+jZtclffdPKss+5WZZbPrZpafP9ts5bHYPT6hKnv9sJRTXv9QuXDKe8pjE6z0Xh8g8+tPf/pT/RxtHu1tuummpaqquh2FrnfU7bPKzU9X5c2ZpYyaWMrBNzeXF97o6rmiN5sxqyrvuWlWuX9sU5lR+pWnZ61eDrqllOmzqq6etR6nVwZIo3SxyiqrzPZeY9j48eM7fb5oa+KbVfnlC22HvTWrlJ88a02x+Px+XCljJ7cd9uKUpvK7F631BdUrA2TatGn184ABA2Z7b+DAgW3G6Q5eeeWV8tZbb7W8njx5cnnjjX8ehk+fPr28/PLLbT4zbty4ub5+6aWX6pJWd/6OZfuXsky/2Y/6Vl3mn/+PoO/uy9FV37GgespyLe7vaL19tbbK0j1rObrDdtZUtf62HqTRiN5RN97rr7++fOUrXylf/epXy7ve9a427/36178up512WjnjjDPKIYcc0olzTEfO+V1z+fxv/tnusdVqpdx/WFWu//bI+vWIESPqzhCwqKtOv//EP3d9wzeqyo0H2c56dS+s+bXyyivXzxMmzN4y1hjWunGdrvOfO/Yp2w8t5Y5nq7LhCk3lQ+9sKv2bZvpJWKyuf0+fsv96M8t1v/hTWa/vxHL5vrtZ4wm9MkA22WST+vnxxx8vBx988Gznh8RJhW9/+9u7aO5ob9h6fcqw9f75esYM64jFq2+fpnLE20p587cP/v9rAZLRK9tA1l577fLOd76z3HPPPW1KIfH/GLbtttu2lFIAWAJKID/5yU9aGngmTZpUZsyYUa699tr6dVzWZP/9928Z95Of/GQ58cQTy7HHHluOOOKIetgNN9xQmpub6zYQAJagALnlllvKH//4xzbDvv71r9fPW221VZsA2XzzzctVV11Vvva1r9WPxrWwvvzlL5eNN9640+cdoLfpUQFy9dVXL9D4ERgRHgAser2yDQSAxU+AAJAiQABIESAApAgQAFIECAApAgSAFAECQIoAASBFgACQIkAASBEgAKQIEABSBAgAKQIEgBQBAkCKAAEgRYAAkCJAAEgRIACkCBAAUgQIACkCBIAUAQJAigABIEWAAJAiQABIESAApAgQAAQIAJ1HCQSAFAECQIoAASBFgACQIkAASBEgAKQIEABSBAgAKQIEgBQBAkCKAAEgRYAAkCJAAEgRIACkCBAAUgQIACkCBIAUAQJAigABIEWAAJAiQABIESAApAgQAFIECAApAgSAFAECQIoAASBFgACQIkAASBEgAKQIEABSBAgAKQIEgBQBAkCKAAEgRYAAkCJAAEgRIACkCBAAUgQIAAIEgM6jBAJAigABIEWAAJAiQABIESAApAgQAFIECAApAgSAFAECQIoAASBFgACQIkAASBEgAKQIEABSBAgAKQIEgBQBAkCKAAEgRYAAkCJAAEgRIACkCBAAUgQIACkCBIAUAQJAigABIEWAAJAiQABIESAApAgQAFIECAApAgSAFAECQIoAASBFgACQIkAASBEgAKQIEABSBAgAKQIEgBQBAkCKAAEgRYAAkCJAAEgRIACkCBAAUgQIACkCBIAUAQJAigABIEWAAJAiQABIESAApAgQAFIECAApAgSAFAECQIoAASBFgACQIkAASBEgAKQIEABSBAgAKQIEgBQBAkCKAAEgRYAAkCJAAEgRIACkCBAAUgQIACkCBIAUAQJAigABIEWAAJAiQABIESAApAgQAFIECAAp/XIfg67x1KtV+Y9fNZdHxldlpzWbygW79ClrDm7yc7BAnnutKp/9ZSm/eGN4Wa/vxLLH66VstJKVuKAECD3G9FlV2esHs8rzb/zj9f++VpVRE2aVR4+xGTP/mquqvPuHs8qTr8aBx3Jl4szlynt+VJUnPlqVvn0cjCwIVVj0GPc9X7WER8NjE0p5bHzVVbNED/TAuFKefLXtsKdfayq/H9dVc9RzCRB6jEH9Oz46XLZ/p88KPdicthfb0YITIPQYO65Ryk5rtB128IZNZcMVVDsw/zZbpakMW6/tNrPn2lXZYlXb0YJSeUyP0dTUVH4+vG+58pGqPDqhKjuu0VRO2MwfPQvuxwf1KVf8cWa58XfPlnX7TizXvndbqzFBgNCjDB7QVD67vdBg4SzTv6mctlUpQx677/9fC5AMVVgApAgQAFIECAApAgSAFAECQIoAASBFgACQIkAASBEgAKQIEABSBAgAKQIEgBQBAkCKAAEgRYAAkCJAAEgRIACkCBAAUgQIACkCBIAUAQJAigABIEWAAJAiQADonAC57bbbyjbbbFMeeuihsqj95S9/KR/72MfKHnvsUX/HVVddVQ+fNGlS+fznP1/23Xffevjxxx+/yL8bgAXTr3QTM2fOLJ/5zGfq5xNPPLEMHjy4bLTRRvV7l1xySbnrrrvKRz7ykbLmmmuWFVdcsatnF2CJ120CZOzYsfXjtNNOK0cccUSb9x544IGyww47lOOOO67L5g+AbtoG8vLLL9fPQ4YM6fC9joYvrClTpizyaQIsKdIBMmvWrLqN4oADDig77rhjOfLII8sdd9zRZpxorzj77LPn2Y4SbRqNdo0vfOEL9XuNz8ZzVVXl9ttvbxken29dOjn55JPL7rvvXnbaaad6Pn74wx/O9p3vfe976+944oknyimnnFJ22223ctRRR2UXny7SXFXllqeby9m/mVXufK7Z70BK7FN+9mwpt03bsoyasVapKiuyU6uwLrvssjJ16tQyfPjw+nXs1D/3uc+V6dOn1zvrBRFtG5tvvnkZOXJked/73le23HLLeviGG25Ytttuu7oBPYbFe2GzzTarn3/0ox+V888/v2y66ab1NJZeeuk6UC644IK6OuwTn/hEm+/5+9//XjfS77333mXPPfcsb775Znbx6SJH395cbvhL46+9KqduVZWv7tnX78ECOf7O5nLtqKZSyj/2NZPvrsrI91iJnRYg0TPq+9//fhk0aFD9OoIkjv6jwXufffYpSy211HxPK9o3+vXrVwdIhMN73vPPX3LjjTeuAyQaz1sPnzhxYrnooovKsGHDype+9KWW4Ycddlg9/Lvf/W459NBDy1prrdXyXoTKmWeeWQ4++ODsYtOFHhtftQqPf7j8kap8ZtuqrDk4dgYwb0+/WpVrR7Xdjq4b01TO2LEqG61gO+qUKqwIjEZ4hPh/7LBff/318vDDD5fF7e67765LOwcddFAdZq0fu+yyS2lubi4PPvhgm89EO8qClo46wyuvvFLeeuutlteTJ08ub7zxRsvrWM5GG1HDuHHj5vr6pZdeqovpPf07xo8f3/IdL7wxez1Dc1XKU+OndPvlWBzfsaB6ynIt7u8YO7l06PnXe9ZydIftLF0CWW+99WYbtv7667cc6S9uzz33XP180kknzXGcWHmtRSmmb9/uV93Rvlty62AOAwYMKCuttFKbYUOHDp3r69VXX73HfseMGTNaXq+66qqlqekfR4W7rt1Uhgws5bV//j2UtQeXsvP6y3bL5Vjc37GgespyLe7v2GFoKasuU8r4VjXYqyxdlZ3WbOpRy9EdtrMu6cYbDfALq5Gy0ei+8sordzhOBEZrC1KtRvczeEBTueXgvuXku2eVP71cyjarlXL1sL6lXx/VDsy/gf2ayq3v61tOuHNmeWxCU1mrz8vlf967Ylmqn+1oQfVb2BJAa88++2ybHXdUGb322muzjbcoSihrr712/bz88suX7bfffqGnR8+w29pNZfSIfmVmcyU4SNt+aFP5w9GlXPvNkaVvU1W2HzrC2uzMNpDoKhv1aQ3x/5tuuqk+g3zrrbeuh62zzjpl1KhRZdq0aS3jRRvJrbfeWhZWNNRH8Su6Ereefuv5ifo9eielDhaFCA+6oAQSR/7HHHNMS6N0dOONBpzo5dSoKjr88MPLf/7nf9aXJokeVNF4c/PNN9d1bO0bbhbUaqutVk4//fRy7rnn1j2vYvox3VdffbU8/fTT5b777is33nhjWWONNRbqewBYxAHy8Y9/vDz66KP1Tjoaq6O0ETvzuOBhw3777VcmTJhQfvCDH9Tde6Nq69hjjy19+vQpo0ePLgvrwAMPrL/3+uuvr88JiYCKYFt33XXr8z3aNw4BsOg0Va37fEE3EL2w4pygMGLEiNK/f/+uniV6IdtZL7oWFgA9iwABIEWAAJAiQABIESAApAgQAFIECAApAgSAFAECQIoAASBFgACQIkAASBEgAKQIEABSBAgAKQIEgBQBAkCKAAEgRYAAkCJAAEgRIACkCBAAUgQIACkCBIAUAQJAigABIEWAAJAiQABIESAApAgQAFIECAApAgSAFAECQIoAASBFgACQIkAASBEgAKQIEABSBAgAKQIEgBQBAkCKAAEgRYAAkCJAAEgRIACkCBAAUgQIACkCBIAUAQJAigABIEWAAJAiQABIESAApAgQAFIECAApAgSAFAECQIoAASBFgACQIkAASBEgAKQIEABSBAgAKQIEgBQBAkCKAAEgRYAAkCJAAEgRIACkCBAAUgQIACkCBIAUAQJAigABIEWAAJAiQABIESAApAgQAFIECAApAgSAFAECQIoAASBFgACQIkAASBEgAKQIEABSBAgAKQIEgBQBAkCKAAEgRYAAkCJAAEgRIACkCBAAUgQIACkCBIAUAQJAigABIEWAAJAiQABIESAApAgQAFIECAApAgSAFAECQIoAASBFgACQIkAASBEgAKQIEABSBAgAKQIEgBQBAkCKAAEgRYAAkCJAAEgRIACkCBAAUgQIACkCBIAUAQJAigABIEWAAJAiQABIESAApAgQAFIECAApAgSAFAECQIoAASBFgACQIkAASBEgAKQIEABSBAgAKQIEgBQBAkCKAAEgRYAAkCJAABAgAHQeJRAAUgQIACkCBIAUAQJAigABIEWAAJAiQABIESAApAgQAFIECAApAgSAFAECQIoAASBFgACQIkAASBEgAKQIEABSBAgAKQIEgBQBAkCKAAEgRYAAkCJAAEgRIACkCBAAUgQIACkCBIAUAQJAigABIEWAAJAiQABIESAApAgQAFIECAApAgSAFAECQIoAASBFgACQIkAASBEgAAgQADqPEggAKQIEgBQBAkCKAAEgRYAAkCJAAEjpl/sYi0pVVeWNN96wQluZMWNGmTp1av3/119/vfTv39/6aWfw4MGlqanJdrYQbGcLv401VbEHo8vEDnLIkCF+ARbIa6+9VpZbbjnbGV26jQmQHl4CmTx5ctl///3LT37ykzJo0KDSW/TG5VqUy9TZJZDe+Hv01uWavIiWaX62MVVYXSx+oAU5kmyvT58+pW/fvvU0essfQG9drq5cJttZ9/tNesMyaUQHIEWAAJAiQHq4AQMGlOOOO65+7k1643L15GXqyfO+pC3XgE5cJo3oAKQogQCQIkAASBEgPdSvfvWrctRRR5WddtqpHHLIIeXWW2+drzNvv/rVr9b1ozvvvHPZZpttyqRJk0pne+6558pJJ51Uz8O73/3uep5i3ubnXIbrrruu7uP+rne9q4wYMaKMGjWqdAfZZbrxxhvLaaedVvbee+/697j77rtLd2Eb617bWHfczgRID/Too4+WT3/602XTTTctl156adlnn33KOeecM8+NYtq0aeXmm2+uG9e23HLL0lVn3p944oll5syZ5cILL6z/GH784x+Xiy++eJ6f/da3vlWuuuqqcvTRR5dLLrmkrLzyyuWUU04pL7zwQulKC7NMcbJXhHgEYndiG+te21i33c7iUib0LCeffHI1YsSINsPOOOOMavjw4fP8bHNzc/186623VltvvXX16quvVp3pm9/8ZrXzzjtXkyZNahl20003Vdttt101fvz4OX5u2rRp1a677lpdfvnlLcOmT59eHXDAAdX5559fdaXsMoVZs2bVz2PHjq1/j7vuuqvqDmxj3Wsb667bmRJIDzN9+vTy0EMP1UXR1oYNG1aeffbZ8uKLL8718wty+YvF4be//W3Zbrvt2lz/K0pQzc3N5fe///0cP/f444+XKVOmtFnuuMjiHnvsUX7zm9+UnrhMjbOGuxvbWPfbxrrrdtb9tl7mKorSUYRdb7312gxff/31W+pIu7OYv/bzHtfciaqCuc17472Olvull16qq+d62jJ1V7ax7reNddftTID0MFEP2thwWmtcT6vxfncV89d+3kMMm9u8x3vRdjNw4MDZPtfVl8TPLlN3ZRvrfttYd93OXEyxm1w9c+LEifMcb8011+yU+aH3sY2xOAiQbiB6T5177rnzHO+HP/xhS0kjdgitNY5AFubKvp0h5q/9vIc4upvbvMd7UTf/1ltvtSmFxOeiXaejI7PuvkydyTbWs7ex7rqdCZBu4OCDD64f8yM28H79+tV1njvuuOM82wi6m5i/9vW1jaPjuc17472//vWvZeONN24ZHtNaffXVy1JLLVV62jJ1JttYz97Guut2pg2kh4l2gDgR6J577mkz/K677qob+9ZYY43SncWJjw8++GCb+uQ4Oo5eIjvssMMcP7fZZpuVZZddts25LtGZ4N577+3ycyiyy9Rd2ca63zbWXbczJZAe6Nhjjy0nnHBCueCCC+purQ8//HD5+c9/Xs4///w2422//fb1Wduf//znW4ZFd8S43/iYMWNazjZeZpllyr/8y7/Uj8Xt0EMPLTfccEP55Cc/WT7ykY+U8ePH12fTxtn0q6yySst4H/vYx8q4cePqEx9DVCnEWcFXX311WWGFFcqGG25Yn10bt938wAc+ULpSdplC/A7R9bpxRYDRo0fXz7GMW2+9dekqtrHutY111+3M1Xh7qF/+8pfla1/7Wl3cjuL1hz/84XLQQQe1GSdKKgcccEA5++yzW4a9973vrTeu9uLyJhFKnSHOV4kzaR977LG6VBEhF2fVRp/7huOPP76ez9tuu222S5lEW9Crr75aVzP8+7//e1066WrZZYrf5vbbb59teltttVUdll3JNta9trHuuJ0JEABStIEAkCJAAEgRIACkCBAAUgQIACkCBIAUAQJAigABIEWAAGlxZYC4Uu19991nLbYS6yPWS6yf3rxsAgQ6yf/+7//Wl5l4+9vfXl9/LK5D9I53vKMcc8wx9QX7Wourq/7rv/7rHKcVl66JP+I53Ufmz3/+c/1+PO6///45TqcxTuMRV5zdaKON6st3vPLKK6UzxGU2Wl+3qad49NFH63nviXedXFRcTBE6QdzHfrfddquvWfShD32obLLJJvVFLZ966qly55131veaiHtvLyrf+MY36mkuvfTS5Zvf/GbZZZdd5jjuFltsUV+gL0Ro/PSnPy2XXHJJfYXnuFBnXJ13Tj74wQ+WI488cq7jzMsXvvCFOkTn95YG3UUESMz77rvvPtvl1Hfdddf69219jareSIBAJ4gdzZtvvlnvdDbffPPZ3o97bi8qM2bMKN/5znfKYYcdVoYMGVJfLO/SSy+d4w2R4k6Xra82e+qpp9YX3YyL791yyy31dOakb9++9aO7ikufd8WNoPr06dPl9w/pDKqwoBNESWOllVbqMDxCXFF5UYmrsMalvuOoPqq6pkyZUl8GfEG8+93vrp+ffvrpBW4DaQz7xS9+US666KKywQYb1Jfjjyvbfutb32oZL6p+YrwQw1tXpbUW97wYNmxYWX755eudclwZ9+tf//ps8xKlgCgNPPLII/X8R3g2rqIbQXLmmWfWtzhYeeWV6/mJy7WffvrpdbC3F1d+vuaaa+rxBw0aVD823XTTllsjRNXViBEj6v9HybEx37G+59YGEr/Ff/zHf7Ssk/jdo0QaV9VurfXnR44cWZdYY/x11123/Nd//VeZl7hse6yruNR7R2IeYvpxQBPiUu9RCo3SaFStxmff+c53li9/+ctl1qxZc/weJRDoBLHD+Mtf/lJ+9KMfzfGPur34w51TG0fcdnVu1Vdxc7GotoqdxJZbbllXY8U9PhYk8ELsbLPOOOOMuhonbhMQO7+4/UDsYGPHHTdointYREkpqsFiXqN9qL0oPZ144on1DZM+97nP1Zcwj6q1uOfFM888U1/avLW//e1vZc8996xLTXH/jMYtYMeOHVuuvfbaetjRRx9d39UzLlcfO+MInDvuuKPNdGKevvvd79YBEt8b4fXEE0/UtxL44he/WP+G48aNq+cvljPashq/89xKhhFscU+e4cOH1zvsWM+xXqIaM6o511prrTafiaD8+9//Xj760Y/W83D99deXz372s/V4sRxzEuMeeOCBdQkyqiVXXHHFlveam5vrZYtwjcAIjz/+eL1tvu9976uXIeY17jEUARttd1dddVXHX1QBi91vf/vbqn///lX8yW200UbViBEjqiuvvLIaM2ZMh+Ovu+669bjzekyYMKHN58aOHVv17du3Ouuss1qGfeUrX6nH7ei7YviwYcPq6cTjySefrC6++OJ6XocMGVL9/e9/n+tyjRw5sp7GvffeO9uwLbbYonrrrbdahr/wwgvVgAEDqiOPPHK2eTjmmGNmm/aLL75YDRw4sDrqqKNme+/UU0+t+vTpUz3zzDOzrbNrrrlmtvFjPqZPnz7b8DPPPLP+zAMPPNAy7IYbbqiHfeADH6hmzZrVZvzWr0d2sOwNMSzei3Earr766nrYpz/96Tbj3n777S3f1/7zQ4cOrSZNmtQyfMqUKdXKK69c7bDDDtW8NKZ7xRVXtBl+991318P/+7//u2XYm2++WTU3N882jZinWM/xW3S0bKqwoBPE/eujQTqqleIOd1EtETcCimqCaHCNo7yOqmTiaLujR1TpdCSqPOIIM6pFGt7//vfXjblRCulIHP1GaSAejRsoxXzF8FVXXTW9zLF8rRvXo60lpt8o3cxLHO1HSSuOvqMk1voRbTSxnK1vcRziSLtRtdRazEejQTtuUxs3JIvpxB09wwMPPNAybhydh6h+i7aM1tq/XhA//vGP689H9VFrcVOoKAlEaSGWqbVYlqiKa4jee1Eam591GKWd1VZbrXz7299uMzxeRwkstouG6GzRqDqcPn16XWqJ9RPTiHmK0lFHVGFBJ4k69EadeNR5RxVKVKtEN9u4m2T7Hk9RXdPYwbUXVRntxcF8hERUTcQffev2i6gyiuqiuO1x7Dxai2qac889t/5/o559nXXWWejl7egWydEO1L6+f06iK3KY0zoIUb3TWlS/zKlR/8orr6yrhP70pz/NtqOOQGmInfPQoUPrne+ivpvgGmusUbcxtBdtHNEeETvt1qE9p3X48ssvz/P7GiFx8cUXlyeffLIO72iDiaqqOABpvXwRqnGL7AiX2G7+UTDseP20+Y55zgWwyMVOOkoJjfr/qBd/8MEHy84775yeZgRStAuEOJejI9Gzqn132WjnmNtOOmtOO/L2O6c5aYwXO7XYoXek/Q42jtA7EjvRaHOIHWf0MosdeYR1tI1Eu0z7QOku+i5kD7fYxmLZYx3GQUKER7QLRUm4tSh1XnbZZeWII46o23wixKLE9sc//rFuc5nT+hEg0IWi2iBKABEgsTNbGFH6iBJE7Cw6qmqJxuxoYO8p51s0QnBRBFyUvqJK8Gc/+1mbdRMNxe3FkXpUJ0XpZm6lkKZ2vcXmJcIuvi96SEUjd2tjxowpyy233EJ1WuhI9PqLR5RYzznnnHrbaDSwt18/UZX6/e9/v83wefXC0wYCnSDaLaKaoL3opRRtDSHaHbKiXSXaDOII+/DDD697+bR/xE4jdqDRe6g7iS6yHZ31HssRgXjWWWfV66mjZZ5bb7T2R/Kxw29d+mlU27TXaBv4zGc+M9uRd+vPDxo0qH6e3zP2I7hjeu2/M36T6AkWv8/CtLHMSZQ2otrwe9/7Xt21OkoZ7c9RifXTvmQY1V1xQuncKIFAJ/i3f/u3ut46dhLRFhJVLc8//3z9Rx3101HVEMOz/ud//qfeyUY31TmJ96INJs65iO6Z3UU0CkdjeJxzEG0vsaOPs9ujq2p0cY3ux9FNNqr7oupvwoQJZdSoUfXlT+LIvf1Z4B2JAI3G6/3226/ugvv666/X676jM8WjC3DsZONoPdpD4jeLdov4naK77+jRo+vxtt1223qH/6UvfaluI4g2q+g+HSXKjkRVWaz7WM44ByaO+OMIP9pmoqRz3nnnlcUhAjHCMDo1RIC1r75qrJ/oqhvLHaW9KH1FiTbaW+Zqnn3BgIV2xx13VCeddFK12WabVSuttFLd1XbFFVesdt999+ob3/jGbN1Fo0vqJptsMsfpRbfX1t14t9lmm6pfv37VK6+8MsfPTJs2rRo8eHC18cYbtwyLaey///7p5ZpbN96Ourfutttu9bK1Fl2H99lnn3reGt2TW/v1r39dHXzwwdUqq6xSdy+Orq2x3i666KJq6tSpLePFdGP6HZk5c2Z13nnnVRtssEHdlXidddapu9NG1+b4vtbdnkP8Hpdffnm15ZZbVksvvXQ1aNCgatNNN63OPvvsNuNdd9111Tve8Y6WLtqN7sgddeMNkydPrk4//fRq/fXXrz8TyxRdZZ977rk2483p861/+wVxwAEHtHQh70h0D/7Upz5Vr5foOr3hhhtW559/fkuX39bz0XremmLAYok9AHo1bSAApAgQAFIECAApAgSAFAECQIoAASBFgACQIkAASBEgAKQIEABSBAgAKQIEgBQBAkDJ+D9UI1hzPn7vWgAAAABJRU5ErkJggg==" class="shap-img" alt="SHAP Summary Plot">
+                </div>
+                <div class="shap-guide">
+                    <h3>📖 Interpretación del Modelo</h3>
+                    <p>El gráfico superior muestra los factores decisivos para la IA. Las barras <strong>rojas</strong> hacia la derecha indican características que aumentan el riesgo.</p>
+                </div>
+            </div>
+
+            <!-- Critical Findings Section -->
+            <h2 class="section-title">🚨 Hallazgos Críticos (5)</h2>
+            
+            
+    
+            <div class="finding-card vulnerable">
+                <div class="card-header">
+                    <div class="file-name">temp_scan_APIMicroservice\PaqueteTuristico\PaqueteTuristico\src\main\java\com\taller\PaqueteTuristico\controllers\PaqueteTuristicoController.java</div>
+                    <div>
+                        <span style="margin-right: 15px; color: #7f8c8d; font-size: 0.9em;">Confianza del Modelo: <strong>60.00%</strong></span>
+                        <span class="badge badge-vuln">VULNERABLE</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class='finding-detail' style='border-left-color: #3498db;'>🤖 <strong>Predicción ML:</strong> El modelo detectó patrones de riesgo basados en la estructura del código, aunque no hay coincidencias exactas de reglas.</div>
+                </div>
+            </div>
+        
+            <div class="finding-card vulnerable">
+                <div class="card-header">
+                    <div class="file-name">temp_scan_APIMicroservice\PaqueteTuristico\PaqueteTuristico\src\main\java\com\taller\PaqueteTuristico\model\entities\PaqueteTuristico.java</div>
+                    <div>
+                        <span style="margin-right: 15px; color: #7f8c8d; font-size: 0.9em;">Confianza del Modelo: <strong>56.00%</strong></span>
+                        <span class="badge badge-vuln">VULNERABLE</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class='finding-detail' style='border-left-color: #3498db;'>🤖 <strong>Predicción ML:</strong> El modelo detectó patrones de riesgo basados en la estructura del código, aunque no hay coincidencias exactas de reglas.</div>
+                </div>
+            </div>
+        
+            <div class="finding-card vulnerable">
+                <div class="card-header">
+                    <div class="file-name">temp_scan_APIMicroservice\PaqueteTuristico\PaqueteTuristico\src\main\java\com\taller\PaqueteTuristico\services\PaqueteTuristicoImp.java</div>
+                    <div>
+                        <span style="margin-right: 15px; color: #7f8c8d; font-size: 0.9em;">Confianza del Modelo: <strong>72.00%</strong></span>
+                        <span class="badge badge-vuln">VULNERABLE</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class='finding-detail' style='border-left-color: #3498db;'>🤖 <strong>Predicción ML:</strong> El modelo detectó patrones de riesgo basados en la estructura del código, aunque no hay coincidencias exactas de reglas.</div>
+                </div>
+            </div>
+        
+            <div class="finding-card vulnerable">
+                <div class="card-header">
+                    <div class="file-name">temp_scan_APIMicroservice\PaqueteTuristico\PaqueteTuristico\src\main\java\com\taller\PaqueteTuristico\services\PaqueteTuristicoService.java</div>
+                    <div>
+                        <span style="margin-right: 15px; color: #7f8c8d; font-size: 0.9em;">Confianza del Modelo: <strong>64.00%</strong></span>
+                        <span class="badge badge-vuln">VULNERABLE</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class='finding-detail' style='border-left-color: #3498db;'>🤖 <strong>Predicción ML:</strong> El modelo detectó patrones de riesgo basados en la estructura del código, aunque no hay coincidencias exactas de reglas.</div>
+                </div>
+            </div>
+        
+            <div class="finding-card vulnerable">
+                <div class="card-header">
+                    <div class="file-name">temp_scan_APIMicroservice\PaqueteTuristico\PaqueteTuristico\src\test\java\com\taller\PaqueteTuristico\PaqueteTuristicoApplicationTests.java</div>
+                    <div>
+                        <span style="margin-right: 15px; color: #7f8c8d; font-size: 0.9em;">Confianza del Modelo: <strong>60.00%</strong></span>
+                        <span class="badge badge-vuln">VULNERABLE</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class='finding-detail' style='border-left-color: #3498db;'>🤖 <strong>Predicción ML:</strong> El modelo detectó patrones de riesgo basados en la estructura del código, aunque no hay coincidencias exactas de reglas.</div>
+                </div>
+            </div>
+        
+            <h2 class="section-title" style="color: var(--success);">✅ Archivos Seguros (2)</h2>
+            <div class="safe-table-container">
+                <table class="safe-table">
+                    <thead>
+                        <tr>
+                            <th>Archivo</th>
+                            <th>Confianza</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+    
+                        <tr>
+                            <td>temp_scan_APIMicroservice\PaqueteTuristico\PaqueteTuristico\src\main\java\com\taller\PaqueteTuristico\PaqueteTuristicoApplication.java</td>
+                            <td>46.00%</td>
+                            <td><span class="badge badge-safe">SEGURO</span></td>
+                        </tr>
+        
+                        <tr>
+                            <td>temp_scan_APIMicroservice\PaqueteTuristico\PaqueteTuristico\src\main\java\com\taller\PaqueteTuristico\repositories\PaqueteTuristicoRepository.java</td>
+                            <td>50.00%</td>
+                            <td><span class="badge badge-safe">SEGURO</span></td>
+                        </tr>
+        
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <script>
+            // Common Chart Options
+            const chartOptions = {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom' }
+                }
+            };
+
+            // Files Chart
+            new Chart(document.getElementById('filesChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Vulnerables', 'Seguros'],
+                    datasets: [{
+                        data: [5, 2],
+                        backgroundColor: ['#e74c3c', '#27ae60'],
+                        borderWidth: 0
+                    }]
+                },
+                options: chartOptions
+            });
+
+            // Vulnerabilities Chart
+            new Chart(document.getElementById('vulnChart'), {
+                type: 'bar',
+                data: {
+                    labels: ["ML Predicted Risk"],
+                    datasets: [{
+                        label: 'Cantidad de Hallazgos',
+                        data: [5],
+                        backgroundColor: '#3498db',
+                        borderRadius: 5
+                    }]
+                },
+                options: {
+                    ...chartOptions,
+                    scales: {
+                        y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: '#f0f0f0' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        </script>
+    </body>
+    </html>
+    

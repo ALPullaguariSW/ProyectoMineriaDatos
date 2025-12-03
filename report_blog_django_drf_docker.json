@@ -1,0 +1,195 @@
+{
+    "timestamp": "2025-12-03 12:39:29",
+    "total_files": 17,
+    "vulnerable_files": 10,
+    "scan_duration": 0,
+    "results": [
+        {
+            "file": "temp_scan_blog_django_drf_docker\\manage.py",
+            "status": "SAFE",
+            "confidence": 0.26,
+            "details": {
+                "complexity": 2.0,
+                "ast_depth": 8,
+                "dangerous_calls": []
+            },
+            "timestamp": "2025-12-03 12:39:29"
+        },
+        {
+            "file": "temp_scan_blog_django_drf_docker\\blog\\admin.py",
+            "status": "SAFE",
+            "confidence": 0.5,
+            "details": {
+                "complexity": 1,
+                "ast_depth": 7,
+                "dangerous_calls": []
+            },
+            "timestamp": "2025-12-03 12:39:29"
+        },
+        {
+            "file": "temp_scan_blog_django_drf_docker\\blog\\apps.py",
+            "status": "VULNERABLE",
+            "confidence": 0.76,
+            "details": {
+                "complexity": 1.0,
+                "ast_depth": 5,
+                "dangerous_calls": []
+            },
+            "timestamp": "2025-12-03 12:39:29"
+        },
+        {
+            "file": "temp_scan_blog_django_drf_docker\\blog\\forms.py",
+            "status": "VULNERABLE",
+            "confidence": 0.6,
+            "details": {
+                "complexity": 1.0,
+                "ast_depth": 6,
+                "dangerous_calls": []
+            },
+            "timestamp": "2025-12-03 12:39:29"
+        },
+        {
+            "file": "temp_scan_blog_django_drf_docker\\blog\\models.py",
+            "status": "VULNERABLE",
+            "confidence": 0.58,
+            "details": {
+                "complexity": 1.3333333333333333,
+                "ast_depth": 10,
+                "dangerous_calls": []
+            },
+            "timestamp": "2025-12-03 12:39:29"
+        },
+        {
+            "file": "temp_scan_blog_django_drf_docker\\blog\\serializers.py",
+            "status": "VULNERABLE",
+            "confidence": 0.6,
+            "details": {
+                "complexity": 1.0,
+                "ast_depth": 6,
+                "dangerous_calls": []
+            },
+            "timestamp": "2025-12-03 12:39:29"
+        },
+        {
+            "file": "temp_scan_blog_django_drf_docker\\blog\\tests.py",
+            "status": "VULNERABLE",
+            "confidence": 0.64,
+            "details": {
+                "complexity": 1,
+                "ast_depth": 3,
+                "dangerous_calls": []
+            },
+            "timestamp": "2025-12-03 12:39:29"
+        },
+        {
+            "file": "temp_scan_blog_django_drf_docker\\blog\\urls.py",
+            "status": "VULNERABLE",
+            "confidence": 0.54,
+            "details": {
+                "complexity": 1,
+                "ast_depth": 8,
+                "dangerous_calls": []
+            },
+            "timestamp": "2025-12-03 12:39:29"
+        },
+        {
+            "file": "temp_scan_blog_django_drf_docker\\blog\\views.py",
+            "status": "SAFE",
+            "confidence": 0.4,
+            "details": {
+                "complexity": 1.5714285714285714,
+                "ast_depth": 10,
+                "dangerous_calls": []
+            },
+            "timestamp": "2025-12-03 12:39:29"
+        },
+        {
+            "file": "temp_scan_blog_django_drf_docker\\blog\\__init__.py",
+            "status": "VULNERABLE",
+            "confidence": 0.6,
+            "details": {
+                "complexity": 1,
+                "ast_depth": 1,
+                "dangerous_calls": []
+            },
+            "timestamp": "2025-12-03 12:39:29"
+        },
+        {
+            "file": "temp_scan_blog_django_drf_docker\\blog\\migrations\\0001_initial.py",
+            "status": "VULNERABLE",
+            "confidence": 0.62,
+            "details": {
+                "complexity": 1.0,
+                "ast_depth": 16,
+                "dangerous_calls": []
+            },
+            "timestamp": "2025-12-03 12:39:29"
+        },
+        {
+            "file": "temp_scan_blog_django_drf_docker\\blog\\migrations\\__init__.py",
+            "status": "VULNERABLE",
+            "confidence": 0.6,
+            "details": {
+                "complexity": 1,
+                "ast_depth": 1,
+                "dangerous_calls": []
+            },
+            "timestamp": "2025-12-03 12:39:29"
+        },
+        {
+            "file": "temp_scan_blog_django_drf_docker\\myblog\\asgi.py",
+            "status": "SAFE",
+            "confidence": 0.38,
+            "details": {
+                "complexity": 1,
+                "ast_depth": 7,
+                "dangerous_calls": []
+            },
+            "timestamp": "2025-12-03 12:39:29"
+        },
+        {
+            "file": "temp_scan_blog_django_drf_docker\\myblog\\settings.py",
+            "status": "SAFE",
+            "confidence": 0.38,
+            "details": {
+                "complexity": 1,
+                "ast_depth": 10,
+                "dangerous_calls": []
+            },
+            "timestamp": "2025-12-03 12:39:29"
+        },
+        {
+            "file": "temp_scan_blog_django_drf_docker\\myblog\\urls.py",
+            "status": "SAFE",
+            "confidence": 0.38,
+            "details": {
+                "complexity": 1,
+                "ast_depth": 9,
+                "dangerous_calls": []
+            },
+            "timestamp": "2025-12-03 12:39:29"
+        },
+        {
+            "file": "temp_scan_blog_django_drf_docker\\myblog\\wsgi.py",
+            "status": "SAFE",
+            "confidence": 0.38,
+            "details": {
+                "complexity": 1,
+                "ast_depth": 7,
+                "dangerous_calls": []
+            },
+            "timestamp": "2025-12-03 12:39:29"
+        },
+        {
+            "file": "temp_scan_blog_django_drf_docker\\myblog\\__init__.py",
+            "status": "VULNERABLE",
+            "confidence": 0.6,
+            "details": {
+                "complexity": 1,
+                "ast_depth": 1,
+                "dangerous_calls": []
+            },
+            "timestamp": "2025-12-03 12:39:29"
+        }
+    ]
+}

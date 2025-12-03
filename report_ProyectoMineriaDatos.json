@@ -1,0 +1,140 @@
+{
+    "timestamp": "2025-12-03 14:26:03",
+    "total_files": 12,
+    "vulnerable_files": 0,
+    "scan_duration": 0,
+    "results": [
+        {
+            "file": "temp_scan_ProyectoMineriaDatos\\get_chat_id.py",
+            "status": "SAFE",
+            "confidence": 0.4,
+            "details": {
+                "complexity": 5.0,
+                "ast_depth": 11,
+                "dangerous_calls": []
+            },
+            "timestamp": "2025-12-03 14:26:03"
+        },
+        {
+            "file": "temp_scan_ProyectoMineriaDatos\\src\\analyze_training.py",
+            "status": "SAFE",
+            "confidence": 0.32,
+            "details": {
+                "complexity": 1.5,
+                "ast_depth": 10,
+                "dangerous_calls": []
+            },
+            "timestamp": "2025-12-03 14:26:03"
+        },
+        {
+            "file": "temp_scan_ProyectoMineriaDatos\\src\\app.py",
+            "status": "SAFE",
+            "confidence": 0.2,
+            "details": {
+                "complexity": 1.6666666666666667,
+                "ast_depth": 13,
+                "dangerous_calls": []
+            },
+            "timestamp": "2025-12-03 14:26:03"
+        },
+        {
+            "file": "temp_scan_ProyectoMineriaDatos\\src\\eda.py",
+            "status": "SAFE",
+            "confidence": 0.36,
+            "details": {
+                "complexity": 3.0,
+                "ast_depth": 13,
+                "dangerous_calls": []
+            },
+            "timestamp": "2025-12-03 14:26:03"
+        },
+        {
+            "file": "temp_scan_ProyectoMineriaDatos\\src\\evaluate.py",
+            "status": "SAFE",
+            "confidence": 0.46,
+            "details": {
+                "complexity": 3.0,
+                "ast_depth": 12,
+                "dangerous_calls": []
+            },
+            "timestamp": "2025-12-03 14:26:03"
+        },
+        {
+            "file": "temp_scan_ProyectoMineriaDatos\\src\\monitor.py",
+            "status": "SAFE",
+            "confidence": 0.3,
+            "details": {
+                "complexity": 4.0,
+                "ast_depth": 11,
+                "dangerous_calls": []
+            },
+            "timestamp": "2025-12-03 14:26:03"
+        },
+        {
+            "file": "temp_scan_ProyectoMineriaDatos\\src\\notifications.py",
+            "status": "SAFE",
+            "confidence": 0.46,
+            "details": {
+                "complexity": 4.0,
+                "ast_depth": 10,
+                "dangerous_calls": []
+            },
+            "timestamp": "2025-12-03 14:26:03"
+        },
+        {
+            "file": "temp_scan_ProyectoMineriaDatos\\src\\predict.py",
+            "status": "SAFE",
+            "confidence": 0.24,
+            "details": {
+                "complexity": 5.6,
+                "ast_depth": 17,
+                "dangerous_calls": []
+            },
+            "timestamp": "2025-12-03 14:26:03"
+        },
+        {
+            "file": "temp_scan_ProyectoMineriaDatos\\src\\report_generator.py",
+            "status": "SAFE",
+            "confidence": 0.24,
+            "details": {
+                "complexity": 18.0,
+                "ast_depth": 13,
+                "dangerous_calls": []
+            },
+            "timestamp": "2025-12-03 14:26:03"
+        },
+        {
+            "file": "temp_scan_ProyectoMineriaDatos\\src\\repo_miner.py",
+            "status": "SAFE",
+            "confidence": 0.42,
+            "details": {
+                "complexity": 4.0,
+                "ast_depth": 12,
+                "dangerous_calls": []
+            },
+            "timestamp": "2025-12-03 14:26:03"
+        },
+        {
+            "file": "temp_scan_ProyectoMineriaDatos\\tests\\test_pipeline.py",
+            "status": "SAFE",
+            "confidence": 0.44,
+            "details": {
+                "complexity": 3.6666666666666665,
+                "ast_depth": 10,
+                "dangerous_calls": []
+            },
+            "timestamp": "2025-12-03 14:26:03"
+        },
+        {
+            "file": "temp_scan_ProyectoMineriaDatos\\tests\\test_robustness.py",
+            "status": "SAFE",
+            "confidence": 0.24,
+            "details": {
+                "complexity": 2.125,
+                "ast_depth": 10,
+                "dangerous_calls": []
+            },
+            "timestamp": "2025-12-03 14:26:03"
+        }
+    ]
+}
