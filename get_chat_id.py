@@ -9,7 +9,8 @@ def get_chat_id():
     print(f"2. Envíale un mensaje (ej: 'Hola')")
     print(f"3. Esperando mensaje...")
     
-    while True:
+    start_time = time.time()
+    while time.time() - start_time < 30: # Run for 30 seconds max
         try:
             response = requests.get(URL)
             data = response.json()
@@ -23,7 +24,7 @@ def get_chat_id():
                 print(f"\n¡Mensaje recibido de {user}!")
                 print(f"✅ TU CHAT ID ES: {chat_id}")
                 print("\nCopia este ID y úsalo en tus GitHub Secrets como TELEGRAM_CHAT_ID")
-                break
+                return
             
             time.sleep(2)
             print(".", end="", flush=True)
@@ -31,6 +32,9 @@ def get_chat_id():
         except Exception as e:
             print(f"Error: {e}")
             time.sleep(2)
+    
+    print("\n\n⚠️ No se recibió mensaje en 30 segundos.")
+    print("Por favor, envía 'Hola' al bot @plataforma_encuentro_bot y vuelve a ejecutar este script.")
 
 if __name__ == "__main__":
     get_chat_id()
