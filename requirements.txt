@@ -1,0 +1,16 @@
+pandas
+numpy
+scikit-learn
+matplotlib
+seaborn
+radon
+nltk
+joblib
+requests
+pytest
+shap
+transformers
+torch
+fastapi
+uvicorn
+python-multipart

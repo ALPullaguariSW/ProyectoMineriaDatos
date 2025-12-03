@@ -1,0 +1,105 @@
+code,is_vulnerable,cwe_id
+for (int i=0; i<10; i++) { sum += i; },0,None
+"snprintf(buf, sizeof(buf), ""Safe string"");",0,None
+eval(user_input),1,CWE-94
+"String query = ""SELECT * FROM users WHERE name = "" + user;",1,CWE-89
+gets(buffer);,1,CWE-120
+input(prompt),1,CWE-20
+"fgets(buffer, sizeof(buffer), stdin);",0,None
+printf(user_input);,1,CWE-134
+input(prompt),1,CWE-20
+"subprocess.call(cmd, shell=True)",1,CWE-78
+for (int i=0; i<10; i++) { sum += i; },0,None
+char *p = malloc(10); free(p); free(p);,1,CWE-415
+"String query = ""SELECT * FROM accounts WHERE id = "" + request.getParameter(""id"");",1,External-CVE
+for (int i=0; i<10; i++) { sum += i; },0,None
+"PreparedStatement pstmt = conn.prepareStatement(""SELECT * FROM users WHERE name = ?"");",0,None
+"cout << ""Hello"" << endl;",0,None
+ObjectInputStream ois = new ObjectInputStream(is); ois.readObject();,1,CWE-502
+"strcpy(dest, src);",1,CWE-120
+"sprintf(query, ""SELECT * FROM users WHERE id = '%s'"", user_id);",1,CWE-89
+int a = 5; int b = 6; int c = a + b;,0,None
+cursor.execute('SELECT * FROM users WHERE user = ' + username),1,External-CVE
+"printf(""Hello World"");",0,None
+"memcpy(dest, src, len);",1,CWE-120
+def load_yaml(data): yaml.load(data),1,CWE-502
+Runtime.getRuntime().exec(cmd);,1,CWE-78
+char *p = malloc(10); free(p); free(p);,1,CWE-415
+"strcat(dest, src);",1,CWE-120
+"String query = ""SELECT * FROM users WHERE name = "" + user;",1,CWE-89
+printf(user_input);,1,CWE-134
+"strncpy(dest, src, sizeof(dest));",0,None
+"std::string s = ""safe"";",0,None
+"snprintf(buf, sizeof(buf), ""Safe string"");",0,None
+input(prompt),1,CWE-20
+def exec_cmd(cmd): os.system(cmd),1,CWE-78
+"strcpy(dest, src);",1,CWE-120
+"std::string s = ""safe"";",0,None
+gets(buffer);,1,CWE-120
+"cout << ""Hello"" << endl;",0,None
+ObjectInputStream ois = new ObjectInputStream(is); ois.readObject();,1,CWE-502
+Runtime.getRuntime().exec(cmd);,1,CWE-78
+"def login(user): query = 'SELECT * FROM users WHERE name = ?', (user,)",0,None
+int a = 5; int b = 6; int c = a + b;,0,None
+def load_yaml(data): yaml.safe_load(data),0,None
+def load_yaml(data): yaml.safe_load(data),0,None
+char *p = malloc(10); free(p); free(p);,1,CWE-415
+printf(user_input);,1,CWE-134
+"fgets(buffer, sizeof(buffer), stdin);",0,None
+int *p = NULL; *p = 1;,1,CWE-476
+if (x > 0) { y = x; },0,None
+"strcat(dest, src);",1,CWE-120
+"cout << ""Hello"" << endl;",0,None
+"cout << ""Hello"" << endl;",0,None
+"snprintf(buf, sizeof(buf), ""Safe string"");",0,None
+eval(user_input),1,CWE-94
+"cout << ""Hello"" << endl;",0,None
+for (int i=0; i<10; i++) { sum += i; },0,None
+"def exec_cmd(cmd): subprocess.run(cmd, shell=False)",0,None
+"sprintf(query, ""SELECT * FROM users WHERE id = '%s'"", user_id);",1,CWE-89
+for (int i=0; i<10; i++) { sum += i; },0,None
+if (x > 0) { y = x; },0,None
+"snprintf(buf, sizeof(buf), ""Safe string"");",0,None
+int a = 5; int b = 6; int c = a + b;,0,None
+os.system('ping ' + host),1,External-CVE
+"memcpy(dest, src, len);",1,CWE-120
+def login(user): query = 'SELECT * FROM users WHERE name = ' + user,1,CWE-89
+"def login(user): query = 'SELECT * FROM users WHERE name = ?', (user,)",0,None
+input(prompt),1,CWE-20
+def login(user): query = 'SELECT * FROM users WHERE name = ' + user,1,CWE-89
+def load_yaml(data): yaml.safe_load(data),0,None
+"PreparedStatement pstmt = conn.prepareStatement(""SELECT * FROM users WHERE name = ?"");",0,None
+Runtime.getRuntime().exec(cmd);,1,CWE-78
+"cout << ""Hello"" << endl;",0,None
+"def login(user): query = 'SELECT * FROM users WHERE name = ?', (user,)",0,None
+ObjectInputStream ois = new ObjectInputStream(is); ois.readObject();,1,CWE-502
+"fgets(buffer, sizeof(buffer), stdin);",0,None
+for (int i=0; i<10; i++) { sum += i; },0,None
+"def exec_cmd(cmd): subprocess.run(cmd, shell=False)",0,None
+"strncpy(dest, src, sizeof(dest));",0,None
+system(cmd);,1,CWE-78
+"PreparedStatement pstmt = conn.prepareStatement(""SELECT * FROM users WHERE name = ?"");",0,None
+"snprintf(buf, sizeof(buf), ""Safe string"");",0,None
+int *p = NULL; *p = 1;,1,CWE-476
+"std::string s = ""safe"";",0,None
+for (int i=0; i<10; i++) { sum += i; },0,None
+"snprintf(buf, sizeof(buf), ""Safe string"");",0,None
+gets(buffer);,1,CWE-120
+int a = 5; int b = 6; int c = a + b;,0,None
+"subprocess.call(cmd, shell=True)",1,CWE-78
+"PreparedStatement pstmt = conn.prepareStatement(""SELECT * FROM users WHERE name = ?"");",0,None
+"printf(""Hello World"");",0,None
+document.write(userInput);,1,External-CVE
+ObjectInputStream ois = new ObjectInputStream(is); ois.readObject();,1,CWE-502
+"def exec_cmd(cmd): subprocess.run(cmd, shell=False)",0,None
+input(prompt),1,CWE-20
+"cout << ""Hello"" << endl;",0,None
+def load_yaml(data): yaml.load(data),1,CWE-502
+"subprocess.call(cmd, shell=True)",1,CWE-78
+int *p = NULL; *p = 1;,1,CWE-476
+Runtime.getRuntime().exec(cmd);,1,CWE-78
+printf(user_input);,1,CWE-134
+def exec_cmd(cmd): os.system(cmd),1,CWE-78
+pickle.loads(data),1,CWE-502
+"PreparedStatement pstmt = conn.prepareStatement(""SELECT * FROM users WHERE name = ?"");",0,None
+"strcat(dest, src);",1,CWE-120
