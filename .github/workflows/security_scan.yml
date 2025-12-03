@@ -1,34 +1,67 @@
-name: Security Scan
+name: Security Pipeline (SEMMA)
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [ "main", "test" ]
+  pull_request:
+    branches: [ "main", "test" ]
 
 jobs:
-  semma-scan:
+  security-pipeline:
     runs-on: ubuntu-latest
-    
+    env:
+      TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      PYTHONPATH: src
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
-      
+
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.9'
-        
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-        
-    - name: Train Model (if needed)
+
+    - name: 🚀 Notify Pipeline Start
+      if: always()
+      run: python src/notifications.py "🚀 Pipeline Started for commit ${{ github.sha }}"
+
+    - name: 🧠 Train Model (Simulation)
       run: |
-        # In a real scenario, you might download a pre-trained model.
-        # Here we train it on the fly for demonstration.
         python src/data_loader.py
-        python src/preprocessing.py
         python src/train_model.py
-        
-    - name: Run Vulnerability Scan
+
+    - name: 🛡️ Security Scan (Phase 1)
+      id: scan
       run: |
-        # Scan the src directory as an example
-        python src/predict.py src/
+        python src/predict.py src/ > scan_output.txt
+        cat scan_output.txt
+        if grep -q "\[VULNERABLE\]" scan_output.txt; then
+          echo "Vulnerabilities found!"
+          exit 1
+        fi
+
+    - name: ❌ Notify Scan Failure
+      if: failure() && steps.scan.outcome == 'failure'
+      run: python src/notifications.py "❌ Security Alert! Vulnerabilities detected in the codebase. Pipeline blocked."
+
+    - name: ✅ Notify Scan Success
+      if: success()
+      run: python src/notifications.py "✅ Security Scan Passed. No vulnerabilities found."
+
+    - name: 🧪 Unit Tests (Phase 2)
+      run: |
+        pytest tests/
+
+    - name: 🚀 Deploy to Production (Phase 3)
+      if: github.ref == 'refs/heads/main' && success()
+      run: |
+        echo "Deploying to production..."
+        # Add actual deployment commands here (e.g., docker push)
+        python src/notifications.py "🚀 Deployment Successful! API is live."
