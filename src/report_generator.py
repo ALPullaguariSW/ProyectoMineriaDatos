@@ -128,10 +128,34 @@ def generate_html_report(scan_results_file="scan_report.json", shap_image_path="
         details_html = ""
         if file_result.get('details'):
             details = file_result['details']
-            # Dangerous Calls
-            if details.get('dangerous_calls'):
-                for call in details['dangerous_calls']:
-                    details_html += f"<li class='detail-item'>⚠️ {call}</li>"
+            
+            # New Rich Findings (List of Dicts)
+            if isinstance(details.get('dangerous_calls'), list) and len(details['dangerous_calls']) > 0:
+                # Check if it's the new format (dict) or old format (string)
+                first_item = details['dangerous_calls'][0]
+                if isinstance(first_item, dict):
+                    details_html += "<div style='margin-top: 10px;'>"
+                    for finding in details['dangerous_calls']:
+                        severity_color = "#e74c3c" if finding['severity'] in ["Critical", "High"] else "#f39c12"
+                        details_html += f"""
+                        <div style="border-left: 4px solid {severity_color}; background: #f8f9fa; padding: 10px; margin-bottom: 10px; border-radius: 4px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <strong style="color: {severity_color};">{finding['type']} ({finding['severity']})</strong>
+                                <span style="background: #34495e; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.8em;">Línea {finding['line']}</span>
+                            </div>
+                            <p style="margin: 5px 0;">{finding['description']}</p>
+                            <code style="display: block; background: #2c3e50; color: #ecf0f1; padding: 8px; border-radius: 4px; font-family: monospace; margin: 5px 0;">{finding['content']}</code>
+                            <div style="background: #d4edda; color: #155724; padding: 8px; border-radius: 4px; font-size: 0.9em; margin-top: 5px;">
+                                <strong>💡 Solución:</strong> {finding['remediation']}
+                            </div>
+                        </div>
+                        """
+                    details_html += "</div>"
+                else:
+                    # Fallback for old string format
+                    for call in details['dangerous_calls']:
+                        details_html += f"<li class='detail-item'>⚠️ {call}</li>"
+            
             # Complexity
             if details.get('complexity', 0) > 10:
                 details_html += f"<li class='detail-item'>📉 Complejidad Ciclomática Alta: {details['complexity']} (Difícil de mantener)</li>"
@@ -140,14 +164,14 @@ def generate_html_report(scan_results_file="scan_report.json", shap_image_path="
                 details_html += f"<li class='detail-item'>🌳 Profundidad de AST excesiva: {details['ast_depth']}</li>"
         
         if not details_html and is_vuln:
-             details_html = "<li class='detail-item'>🤖 El modelo detectó patrones de riesgo basados en el texto del código.</li>"
+             details_html = "<li class='detail-item'>🤖 El modelo detectó patrones de riesgo basados en el texto del código (ML Prediction).</li>"
 
         html_content += f"""
                         <tr class="vuln-row">
-                            <td>{file_result['file']}</td>
-                            <td><span class="badge {status_class}">{status_text}</span></td>
-                            <td>{prob}</td>
-                            <td><ul class="detail-list">{details_html}</ul></td>
+                            <td style="vertical-align: top;"><strong>{file_result['file']}</strong></td>
+                            <td style="vertical-align: top;"><span class="badge {status_class}">{status_text}</span></td>
+                            <td style="vertical-align: top;">{prob}</td>
+                            <td style="vertical-align: top;">{details_html}</td>
                         </tr>
         """
 

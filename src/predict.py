@@ -87,7 +87,12 @@ def scan_directory(path, model, vectorizer):
                     if status == "VULNERABLE":
                         print(f"\033[91m[{status}] {filepath} (Confidence: {prob:.2f})\033[0m")
                         if details['dangerous_calls']:
-                            print(f"  ⚠️  Dangerous Calls: {', '.join(details['dangerous_calls'])}")
+                            print("  ⚠️  Findings:")
+                            for finding in details['dangerous_calls']:
+                                if isinstance(finding, dict):
+                                    print(f"    - [Line {finding['line']}] {finding['type']}: {finding['description']}")
+                                else:
+                                    print(f"    - {finding}")
                     else:
                         # Only print safe if verbose or just summary? Let's keep it quiet for safe files to avoid clutter
                         # print(f"\033[92m[{status}] {filepath} (Confidence: {prob:.2f})\033[0m")

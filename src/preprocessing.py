@@ -108,21 +108,127 @@ def _compute_ast_depth(node):
     return 1 + max_child_depth
 
 def get_dangerous_details(code):
-    """Returns a list of specific dangerous functions found in the code."""
-    patterns = {
-        'C/C++': [r'strcpy\(', r'strcat\(', r'sprintf\(', r'gets\(', r'system\('],
-        'Python': [r'os\.system\(', r'subprocess\.call\(', r'eval\(', r'exec\(', r'pickle\.load\(', r'input\('],
-        'Java': [r'Runtime\.getRuntime\(\)\.exec\(', r'Statement\.execute\(', r'executeQuery\(']
+    """
+    Scans code line-by-line for specific dangerous functions, patterns, and secrets.
+    Returns a list of dictionaries with detailed findings.
+    """
+    findings = []
+    lines = code.split('\n')
+    
+    # Define Knowledge Base of Vulnerabilities
+    # Format: Regex Pattern -> {Type, Severity, Description, Remediation}
+    knowledge_base = {
+        # --- C/C++ ---
+        r'strcpy\(': {
+            "type": "Buffer Overflow", "severity": "High",
+            "desc": "La función 'strcpy' no verifica la longitud del buffer destino.",
+            "fix": "Use 'strncpy' o funciones seguras como 'strcpy_s'."
+        },
+        r'gets\(': {
+            "type": "Buffer Overflow", "severity": "Critical",
+            "desc": "La función 'gets' es inherentemente insegura y obsoleta.",
+            "fix": "Reemplácela con 'fgets'."
+        },
+        r'system\(': {
+            "type": "Command Injection", "severity": "High",
+            "desc": "Ejecutar comandos del sistema operativo puede permitir inyección de comandos.",
+            "fix": "Evite 'system'. Use APIs específicas del lenguaje o valide estrictamente la entrada."
+        },
+        
+        # --- Python ---
+        r'eval\(': {
+            "type": "Code Injection", "severity": "Critical",
+            "desc": "'eval' ejecuta código arbitrario. Si la entrada es controlada por el usuario, es fatal.",
+            "fix": "Use 'ast.literal_eval' para evaluar estructuras de datos seguras."
+        },
+        r'exec\(': {
+            "type": "Code Injection", "severity": "Critical",
+            "desc": "'exec' ejecuta código Python dinámicamente.",
+            "fix": "Evite la ejecución dinámica de código. Reestructure la lógica."
+        },
+        r'pickle\.load': {
+            "type": "Insecure Deserialization", "severity": "High",
+            "desc": "Pickle es inseguro contra datos maliciosos.",
+            "fix": "Use formatos seguros como JSON ('json.load') para serializar datos."
+        },
+        r'subprocess\.call\(.*shell=True': {
+            "type": "Command Injection", "severity": "High",
+            "desc": "Usar 'shell=True' en subprocess abre brechas de seguridad.",
+            "fix": "Establezca 'shell=False' y pase los argumentos como una lista."
+        },
+
+        # --- JavaScript / Node.js ---
+        r'innerHTML': {
+            "type": "XSS (Cross-Site Scripting)", "severity": "Medium",
+            "desc": "Asignar directamente a 'innerHTML' puede permitir inyección de scripts.",
+            "fix": "Use 'textContent' o bibliotecas de sanitización como DOMPurify."
+        },
+        r'document\.write': {
+            "type": "XSS / Performance", "severity": "Medium",
+            "desc": "'document.write' es inseguro y bloquea el renderizado.",
+            "fix": "Use manipulación segura del DOM (e.g., 'appendChild')."
+        },
+        
+        # --- Java ---
+        r'Runtime\.getRuntime\(\)\.exec': {
+            "type": "Command Injection", "severity": "High",
+            "desc": "Ejecución directa de comandos del sistema.",
+            "fix": "Use 'ProcessBuilder' y evite pasar argumentos sin validar."
+        },
+        
+        # --- PHP ---
+        r'shell_exec\(': {
+            "type": "Command Injection", "severity": "High",
+            "desc": "Ejecuta comandos en el servidor.",
+            "fix": "Deshabilite esta función en php.ini si no es necesaria."
+        },
+
+        # --- Cryptography ---
+        r'MD5\(': {
+            "type": "Weak Cryptography", "severity": "Medium",
+            "desc": "MD5 está roto y es vulnerable a colisiones.",
+            "fix": "Use algoritmos modernos como SHA-256 o SHA-3."
+        },
+        r'AES/ECB': {
+            "type": "Weak Encryption Mode", "severity": "High",
+            "desc": "El modo ECB no oculta patrones en los datos.",
+            "fix": "Use modos autenticados como AES-GCM o AES-CBC con IV aleatorio."
+        },
+
+        # --- Secrets ---
+        r'(?i)api_key\s*=\s*[\'"][a-zA-Z0-9_\-]{20,}[\'"]': {
+            "type": "Hardcoded Secret", "severity": "Critical",
+            "desc": "Parece haber una API Key hardcodeada en el código.",
+            "fix": "Mueva las credenciales a variables de entorno o un gestor de secretos."
+        },
+        r'(?i)password\s*=\s*[\'"][^\'"]+[\'"]': {
+            "type": "Hardcoded Password", "severity": "High",
+            "desc": "Contraseña en texto plano detectada.",
+            "fix": "Nunca guarde contraseñas en el código fuente."
+        },
+        
+        # --- SQL Injection ---
+        r'(?i)(SELECT|INSERT|UPDATE|DELETE).*(\+.*\w|\w.*\+)': {
+            "type": "SQL Injection", "severity": "High",
+            "desc": "Concatenación de cadenas en consultas SQL.",
+            "fix": "Use consultas parametrizadas (Prepared Statements) o un ORM."
+        }
     }
-    found = []
-    for lang, regex_list in patterns.items():
-        for p in regex_list:
-            matches = re.findall(p, code)
-            if matches:
-                # Clean up the match (remove parenthesis) for better readability
-                clean_matches = [m.replace('(', '') for m in matches]
-                found.extend(clean_matches)
-    return list(set(found)) # Unique findings
+
+    for i, line in enumerate(lines):
+        line_num = i + 1
+        for pattern, info in knowledge_base.items():
+            if re.search(pattern, line):
+                findings.append({
+                    "line": line_num,
+                    "content": line.strip()[:100], # Truncate long lines
+                    "type": info["type"],
+                    "severity": info["severity"],
+                    "description": info["desc"],
+                    "remediation": info["fix"]
+                })
+
+    return findings
 
 def count_dangerous_calls(code):
     """Counts occurrences of known dangerous functions (C, Python, Java)."""
