@@ -3,8 +3,10 @@ import joblib
 import os
 import matplotlib.pyplot as plt
 import numpy as np
-from data_loader import load_data
-from preprocessing import preprocess_data, extract_features
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from sample.data_loader import load_data
+from modify.preprocessing import preprocess_data, extract_features
 
 MODEL_DIR = "models"
 OUTPUT_DIR = "reports/figures"

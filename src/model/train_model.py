@@ -1,4 +1,4 @@
-    """Trains Random Forest and SVM models."""
+"""Trains Random Forest and SVM models."""
     df = load_data()
     X_train, X_test, y_train, y_test = preprocess_data(df)
     X_train_vec, X_test_vec = extract_features(X_train, X_test)
