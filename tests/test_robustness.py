@@ -16,7 +16,10 @@ class MockModel:
 
 class MockVectorizer:
     def transform(self, text):
-        return [[0]] # Dummy feature
+        class MockArray:
+            def toarray(self):
+                return [[0.1, 0.2, 0.3]] # Dummy features
+        return MockArray()
 
 def test_robustness_empty_file(tmp_path):
     """Test handling of an empty file."""
