@@ -28,7 +28,7 @@ def test_robustness_empty_file(tmp_path):
     vec = MockVectorizer()
     
     # Should not crash
-    pred, prob = predict_file(str(f), model, vec)
+    pred, prob, details = predict_file(str(f), model, vec)
     assert pred == 0
 
 def test_robustness_weird_chars(tmp_path):

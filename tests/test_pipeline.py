@@ -20,7 +20,8 @@ def test_clean_code():
 
 def test_data_loader():
     df = generate_synthetic_data(num_samples=10)
-    assert len(df) == 10
+    # It might be more than 10 because of external CVEs
+    assert len(df) >= 10
     assert "code" in df.columns
     assert "is_vulnerable" in df.columns
 
@@ -55,6 +56,7 @@ def test_model_training_and_prediction(tmp_path):
     model = joblib.load("models/rf_model.pkl")
     vectorizer = joblib.load("models/tfidf_vectorizer.pkl")
     
-    pred, prob = predict_file(str(test_file), model, vectorizer)
+    pred, prob, details = predict_file(str(test_file), model, vectorizer)
     assert pred in [0, 1]
     assert 0.0 <= prob <= 1.0
+    assert isinstance(details, dict)
