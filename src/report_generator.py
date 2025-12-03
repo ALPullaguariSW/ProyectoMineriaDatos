@@ -120,9 +120,10 @@ def generate_html_report(scan_results_file="scan_report.json", shap_image_path="
 
     # Add rows
     for file_result in results.get("results", []):
-        status_class = "badge-high" if file_result['is_vulnerable'] else "badge-safe"
-        status_text = "VULNERABLE" if file_result['is_vulnerable'] else "SEGURO"
-        prob = f"{file_result['probability']:.2%}"
+        is_vuln = file_result.get('status') == 'VULNERABLE'
+        status_class = "badge-high" if is_vuln else "badge-safe"
+        status_text = file_result.get('status', 'UNKNOWN')
+        prob = f"{file_result.get('confidence', 0):.2%}"
         
         details_html = ""
         if file_result.get('details'):
@@ -138,7 +139,7 @@ def generate_html_report(scan_results_file="scan_report.json", shap_image_path="
             if details.get('ast_depth', 0) > 5:
                 details_html += f"<li class='detail-item'>🌳 Profundidad de AST excesiva: {details['ast_depth']}</li>"
         
-        if not details_html and file_result['is_vulnerable']:
+        if not details_html and is_vuln:
              details_html = "<li class='detail-item'>🤖 El modelo detectó patrones de riesgo basados en el texto del código.</li>"
 
         html_content += f"""

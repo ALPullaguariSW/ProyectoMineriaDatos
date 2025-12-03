@@ -106,9 +106,17 @@ def scan_directory(path, model, vectorizer):
     return results
 
 def generate_report(results, output_file="scan_report.json"):
-    """Generates a JSON report of the scan."""
+    """Generates a JSON report of the scan with metadata."""
+    report_data = {
+        "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
+        "total_files": len(results),
+        "vulnerable_files": sum(1 for r in results if r['status'] == 'VULNERABLE'),
+        "scan_duration": 0, # Placeholder, could calculate real duration
+        "results": results
+    }
+    
     with open(output_file, "w") as f:
-        json.dump(results, f, indent=4)
+        json.dump(report_data, f, indent=4)
     print(f"\nReport generated: {output_file}")
 
 def main():
