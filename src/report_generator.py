@@ -65,7 +65,7 @@ def generate_html_report(scan_results_file="scan_report.json", shap_image_path="
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Reporte de Seguridad de Software - Proyecto Minería de Datos</title>
         <style>
-            :root {
+            :root {{
                 --primary: #2c3e50;
                 --secondary: #34495e;
                 --accent: #3498db;
@@ -82,81 +82,81 @@ def generate_html_report(scan_results_file="scan_report.json", shap_image_path="
                 --shadow: 0 4px 6px rgba(0,0,0,0.05);
                 --shadow-hover: 0 8px 15px rgba(0,0,0,0.1);
                 --radius: 12px;
-            }
+            }}
 
-            body { font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif; margin: 0; padding: 0; background-color: var(--bg); color: var(--text); line-height: 1.6; }
+            body {{ font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif; margin: 0; padding: 0; background-color: var(--bg); color: var(--text); line-height: 1.6; }}
             
             /* Header */
-            header { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; padding: 40px 20px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.15); margin-bottom: 40px; }
-            header h1 { margin: 0; font-size: 2.8em; font-weight: 700; letter-spacing: -0.5px; }
-            .subtitle { opacity: 0.9; margin-top: 10px; font-size: 1.2em; font-weight: 300; }
+            header {{ background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; padding: 40px 20px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.15); margin-bottom: 40px; }}
+            header h1 {{ margin: 0; font-size: 2.8em; font-weight: 700; letter-spacing: -0.5px; }}
+            .subtitle {{ opacity: 0.9; margin-top: 10px; font-size: 1.2em; font-weight: 300; }}
             
             /* Layout */
-            .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+            .container {{ max-width: 1200px; margin: 0 auto; padding: 0 20px; }}
             
             /* Stats Grid */
-            .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 25px; margin-bottom: 40px; }
-            .stat-card { background: var(--card-bg); padding: 25px; border-radius: var(--radius); text-align: center; box-shadow: var(--shadow); transition: transform 0.2s ease; border: 1px solid var(--border); }
-            .stat-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-hover); }
-            .stat-number { font-size: 3em; font-weight: 800; line-height: 1; margin-bottom: 10px; }
-            .stat-label { color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.85em; letter-spacing: 1px; }
+            .stats-row {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 25px; margin-bottom: 40px; }}
+            .stat-card {{ background: var(--card-bg); padding: 25px; border-radius: var(--radius); text-align: center; box-shadow: var(--shadow); transition: transform 0.2s ease; border: 1px solid var(--border); }}
+            .stat-card:hover {{ transform: translateY(-5px); box-shadow: var(--shadow-hover); }}
+            .stat-number {{ font-size: 3em; font-weight: 800; line-height: 1; margin-bottom: 10px; }}
+            .stat-label {{ color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.85em; letter-spacing: 1px; }}
             
             /* Charts Grid */
-            .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 30px; margin-bottom: 50px; }
-            .chart-card { background: var(--card-bg); padding: 30px; border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--border); }
-            .chart-card h3 { margin-top: 0; color: var(--primary); font-size: 1.3em; border-bottom: 2px solid var(--light); padding-bottom: 15px; margin-bottom: 20px; }
+            .dashboard-grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 30px; margin-bottom: 50px; }}
+            .chart-card {{ background: var(--card-bg); padding: 30px; border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--border); }}
+            .chart-card h3 {{ margin-top: 0; color: var(--primary); font-size: 1.3em; border-bottom: 2px solid var(--light); padding-bottom: 15px; margin-bottom: 20px; }}
             
             /* Section Titles */
-            .section-title { display: flex; align-items: center; gap: 15px; margin: 60px 0 30px; color: var(--primary); font-size: 2em; font-weight: 700; }
-            .section-title::after { content: ''; flex: 1; height: 2px; background: var(--border); margin-left: 20px; opacity: 0.5; }
+            .section-title {{ display: flex; align-items: center; gap: 15px; margin: 60px 0 30px; color: var(--primary); font-size: 2em; font-weight: 700; }}
+            .section-title::after {{ content: ''; flex: 1; height: 2px; background: var(--border); margin-left: 20px; opacity: 0.5; }}
             
             /* Finding Cards */
-            .finding-card { background: var(--card-bg); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 30px; overflow: hidden; border: 1px solid var(--border); transition: all 0.3s ease; }
-            .finding-card:hover { box-shadow: var(--shadow-hover); transform: translateY(-2px); }
-            .finding-card.vulnerable { border-top: 6px solid var(--danger); }
-            .finding-card.safe { border-top: 6px solid var(--success); }
+            .finding-card {{ background: var(--card-bg); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 30px; overflow: hidden; border: 1px solid var(--border); transition: all 0.3s ease; }}
+            .finding-card:hover {{ box-shadow: var(--shadow-hover); transform: translateY(-2px); }}
+            .finding-card.vulnerable {{ border-top: 6px solid var(--danger); }}
+            .finding-card.safe {{ border-top: 6px solid var(--success); }}
             
-            .card-header { padding: 20px 25px; background: #fcfcfc; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
-            .file-name { font-size: 1.3em; font-weight: 700; color: var(--primary); font-family: 'Consolas', 'Monaco', monospace; }
+            .card-header {{ padding: 20px 25px; background: #fcfcfc; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }}
+            .file-name {{ font-size: 1.3em; font-weight: 700; color: var(--primary); font-family: 'Consolas', 'Monaco', monospace; }}
             
-            .card-body { padding: 25px; }
+            .card-body {{ padding: 25px; }}
             
             /* Detailed Findings */
-            .finding-detail { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin-bottom: 20px; border-left: 5px solid var(--warning); box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-            .finding-detail.critical { border-left-color: var(--danger); }
-            .finding-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-            .finding-type { font-weight: 800; font-size: 1.1em; color: var(--danger); }
-            .line-badge { background: var(--secondary); color: white; padding: 4px 10px; border-radius: 6px; font-size: 0.85em; font-weight: 600; }
+            .finding-detail {{ background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin-bottom: 20px; border-left: 5px solid var(--warning); box-shadow: 0 2px 4px rgba(0,0,0,0.02); }}
+            .finding-detail.critical {{ border-left-color: var(--danger); }}
+            .finding-header {{ display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }}
+            .finding-type {{ font-weight: 800; font-size: 1.1em; color: var(--danger); }}
+            .line-badge {{ background: var(--secondary); color: white; padding: 4px 10px; border-radius: 6px; font-size: 0.85em; font-weight: 600; }}
             
-            .code-block { background: #282c34; color: #abb2bf; padding: 15px; border-radius: 6px; font-family: 'Consolas', monospace; font-size: 0.9em; overflow-x: auto; margin: 15px 0; border: 1px solid #1e2127; }
-            .remediation-box { background: #f0fdf4; color: #166534; padding: 15px; border-radius: 6px; border: 1px solid #bbf7d0; font-size: 0.95em; display: flex; gap: 10px; align-items: start; }
+            .code-block {{ background: #282c34; color: #abb2bf; padding: 15px; border-radius: 6px; font-family: 'Consolas', monospace; font-size: 0.9em; overflow-x: auto; margin: 15px 0; border: 1px solid #1e2127; }}
+            .remediation-box {{ background: #f0fdf4; color: #166534; padding: 15px; border-radius: 6px; border: 1px solid #bbf7d0; font-size: 0.95em; display: flex; gap: 10px; align-items: start; }}
             
             /* Badges */
-            .badge { padding: 8px 16px; border-radius: 30px; font-size: 0.85em; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; display: inline-block; }
-            .badge-vuln { background-color: #fce8e6; color: var(--danger); border: 1px solid #fad2cf; }
-            .badge-safe { background-color: #e6f4ea; color: var(--success); border: 1px solid #ceead6; }
+            .badge {{ padding: 8px 16px; border-radius: 30px; font-size: 0.85em; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; display: inline-block; }}
+            .badge-vuln {{ background-color: #fce8e6; color: var(--danger); border: 1px solid #fad2cf; }}
+            .badge-safe {{ background-color: #e6f4ea; color: var(--success); border: 1px solid #ceead6; }}
             
             /* Safe Table */
-            .safe-table-container { background: var(--card-bg); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; border: 1px solid var(--border); }
-            .safe-table { width: 100%; border-collapse: collapse; }
-            .safe-table th { background: #f8f9fa; padding: 18px 25px; text-align: left; color: var(--text-muted); font-weight: 700; text-transform: uppercase; font-size: 0.85em; letter-spacing: 0.5px; border-bottom: 2px solid var(--border); }
-            .safe-table td { padding: 18px 25px; border-bottom: 1px solid var(--border); color: var(--text); font-size: 0.95em; }
-            .safe-table tr:last-child td { border-bottom: none; }
-            .safe-table tr:hover td { background-color: #f8f9fa; }
+            .safe-table-container {{ background: var(--card-bg); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; border: 1px solid var(--border); }}
+            .safe-table {{ width: 100%; border-collapse: collapse; }}
+            .safe-table th {{ background: #f8f9fa; padding: 18px 25px; text-align: left; color: var(--text-muted); font-weight: 700; text-transform: uppercase; font-size: 0.85em; letter-spacing: 0.5px; border-bottom: 2px solid var(--border); }}
+            .safe-table td {{ padding: 18px 25px; border-bottom: 1px solid var(--border); color: var(--text); font-size: 0.95em; }}
+            .safe-table tr:last-child td {{ border-bottom: none; }}
+            .safe-table tr:hover td {{ background-color: #f8f9fa; }}
             
             /* SHAP */
-            .shap-container { text-align: center; margin: 30px 0; }
-            .shap-img { max-width: 100%; border-radius: 8px; box-shadow: var(--shadow); border: 1px solid var(--border); }
-            .shap-guide { background: #f0f9ff; padding: 25px; border-radius: var(--radius); border: 1px solid #bae6fd; margin-top: 30px; }
-            .shap-guide h3 { color: #0369a1; margin-top: 0; font-size: 1.2em; }
+            .shap-container {{ text-align: center; margin: 30px 0; }}
+            .shap-img {{ max-width: 100%; border-radius: 8px; box-shadow: var(--shadow); border: 1px solid var(--border); }}
+            .shap-guide {{ background: #f0f9ff; padding: 25px; border-radius: var(--radius); border: 1px solid #bae6fd; margin-top: 30px; }}
+            .shap-guide h3 {{ color: #0369a1; margin-top: 0; font-size: 1.2em; }}
             
-            footer { text-align: center; padding: 40px; color: var(--text-muted); font-size: 0.9em; border-top: 1px solid var(--border); margin-top: 60px; }
+            footer {{ text-align: center; padding: 40px; color: var(--text-muted); font-size: 0.9em; border-top: 1px solid var(--border); margin-top: 60px; }}
             
-            @media (max-width: 768px) {
-                .stats-row { grid-template-columns: 1fr 1fr; }
-                .dashboard-grid { grid-template-columns: 1fr; }
-                .card-header { flex-direction: column; align-items: flex-start; }
-            }
+            @media (max-width: 768px) {{
+                .stats-row {{ grid-template-columns: 1fr 1fr; }}
+                .dashboard-grid {{ grid-template-columns: 1fr; }}
+                .card-header {{ flex-direction: column; align-items: flex-start; }}
+            }}
         </style>
     </head>
     <body>
