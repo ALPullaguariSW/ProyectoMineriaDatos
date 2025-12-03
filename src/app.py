@@ -1,7 +1,12 @@
+import sys
+import os
+
+# Add current directory to sys.path to allow imports from src
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
 from fastapi import FastAPI, HTTPException, UploadFile, File
 from pydantic import BaseModel
 import uvicorn
-import os
 import shutil
 import tempfile
 from predict import load_model, predict_file
@@ -19,6 +24,7 @@ class PredictionResult(BaseModel):
     filename: str
     status: str
     confidence: float
+    details: dict
     message: str
 
 @app.get("/")
@@ -37,7 +43,7 @@ async def scan_file(file: UploadFile = File(...)):
             tmp_path = tmp.name
             
         # Predict
-        pred, prob = predict_file(tmp_path, model, vectorizer)
+        pred, prob, details = predict_file(tmp_path, model, vectorizer)
         
         # Cleanup
         os.unlink(tmp_path)
@@ -48,6 +54,7 @@ async def scan_file(file: UploadFile = File(...)):
             "filename": file.filename,
             "status": status,
             "confidence": float(prob),
+            "details": details,
             "message": f"File is {status} with {prob:.2f} confidence."
         }
         

@@ -107,17 +107,26 @@ def _compute_ast_depth(node):
     
     return 1 + max_child_depth
 
+def get_dangerous_details(code):
+    """Returns a list of specific dangerous functions found in the code."""
+    patterns = {
+        'C/C++': [r'strcpy\(', r'strcat\(', r'sprintf\(', r'gets\(', r'system\('],
+        'Python': [r'os\.system\(', r'subprocess\.call\(', r'eval\(', r'exec\(', r'pickle\.load\(', r'input\('],
+        'Java': [r'Runtime\.getRuntime\(\)\.exec\(', r'Statement\.execute\(', r'executeQuery\(']
+    }
+    found = []
+    for lang, regex_list in patterns.items():
+        for p in regex_list:
+            matches = re.findall(p, code)
+            if matches:
+                # Clean up the match (remove parenthesis) for better readability
+                clean_matches = [m.replace('(', '') for m in matches]
+                found.extend(clean_matches)
+    return list(set(found)) # Unique findings
+
 def count_dangerous_calls(code):
     """Counts occurrences of known dangerous functions (C, Python, Java)."""
-    patterns = [
-        r'strcpy\(', r'strcat\(', r'sprintf\(', r'gets\(', r'system\(', # C/C++
-        r'os\.system\(', r'subprocess\.call\(', r'eval\(', r'exec\(', r'pickle\.load\(', r'input\(', # Python
-        r'Runtime\.getRuntime\(\)\.exec\(', r'Statement\.execute\(', r'executeQuery\(' # Java
-    ]
-    count = 0
-    for p in patterns:
-        count += len(re.findall(p, code))
-    return count
+    return len(get_dangerous_details(code))
 
 def extract_features(X_train, X_test):
     """Extracts TF-IDF + Complexity + AST Depth + Dangerous Calls features."""

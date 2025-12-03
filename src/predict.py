@@ -2,7 +2,7 @@ import joblib
 import os
 import argparse
 import sys
-from preprocessing import clean_code, get_complexity, get_ast_depth, count_dangerous_calls
+from preprocessing import clean_code, get_complexity, get_ast_depth, count_dangerous_calls, get_dangerous_details
 import numpy as np
 
 MODEL_DIR = "models"
@@ -39,15 +39,22 @@ def predict_file(filepath, model, vectorizer):
     ast_depth = get_ast_depth(content)
     
     # 4. Dangerous Calls
-    dang_calls = count_dangerous_calls(content)
+    dang_calls_count = count_dangerous_calls(content)
+    dang_details = get_dangerous_details(content)
     
     # Combine
-    features = np.hstack((features_tfidf, np.array([[complexity, ast_depth, dang_calls]])))
+    features = np.hstack((features_tfidf, np.array([[complexity, ast_depth, dang_calls_count]])))
     
     prediction = model.predict(features)[0]
     probability = model.predict_proba(features)[0][1]
     
-    return prediction, probability
+    details = {
+        "complexity": complexity,
+        "ast_depth": ast_depth,
+        "dangerous_calls": dang_details
+    }
+    
+    return prediction, probability, details
 
 import json
 import time
@@ -69,11 +76,13 @@ def scan_directory(path, model, vectorizer):
             if ext in extensions:
                 filepath = os.path.join(root, file)
                 try:
-                    pred, prob = predict_file(filepath, model, vectorizer)
+                    pred, prob, details = predict_file(filepath, model, vectorizer)
                     status = "VULNERABLE" if pred == 1 else "SAFE"
                     
                     if status == "VULNERABLE":
                         print(f"\033[91m[{status}] {filepath} (Confidence: {prob:.2f})\033[0m")
+                        if details['dangerous_calls']:
+                            print(f"  ⚠️  Dangerous Calls: {', '.join(details['dangerous_calls'])}")
                     else:
                         # Only print safe if verbose or just summary? Let's keep it quiet for safe files to avoid clutter
                         # print(f"\033[92m[{status}] {filepath} (Confidence: {prob:.2f})\033[0m")
@@ -83,6 +92,7 @@ def scan_directory(path, model, vectorizer):
                         "file": filepath,
                         "status": status,
                         "confidence": float(prob),
+                        "details": details,
                         "timestamp": time.strftime("%Y-%m-%d %H:%M:%S")
                     })
                 except Exception as e:
