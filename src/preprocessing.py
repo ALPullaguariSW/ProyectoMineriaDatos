@@ -175,6 +175,36 @@ def get_dangerous_details(code):
             "desc": "Ejecución directa de comandos del sistema.",
             "fix": "Use 'ProcessBuilder' y evite pasar argumentos sin validar."
         },
+        r'(?i)Statement\s*=\s*.*createStatement': {
+            "type": "SQL Injection Risk", "severity": "Medium",
+            "desc": "El uso de 'Statement' puede llevar a inyecciones SQL si se concatenan parámetros.",
+            "fix": "Use 'PreparedStatement' con parámetros '?'."
+        },
+        r'(?i)\.executeQuery\s*\(.*[\+]': {
+            "type": "SQL Injection", "severity": "Critical",
+            "desc": "Concatenación detectada en consulta SQL.",
+            "fix": "Use 'PreparedStatement' para evitar inyecciones SQL."
+        },
+        r'MessageDigest\.getInstance\(\"MD5\"\)': {
+            "type": "Weak Cryptography", "severity": "Medium",
+            "desc": "MD5 es un algoritmo de hash obsoleto.",
+            "fix": "Use SHA-256 o superior."
+        },
+        r'new\s+Random\(\)': {
+            "type": "Insecure Randomness", "severity": "Low",
+            "desc": "'java.util.Random' no es criptográficamente seguro.",
+            "fix": "Use 'java.security.SecureRandom' para tokens o claves."
+        },
+        r'System\.out\.print': {
+            "type": "Sensitive Data Exposure", "severity": "Low",
+            "desc": "El uso de 'System.out' puede exponer información sensible en los logs.",
+            "fix": "Use un logger configurado (SLF4J, Log4j) con niveles adecuados."
+        },
+        r'printStackTrace\(\)': {
+            "type": "Information Leakage", "severity": "Low",
+            "desc": "Imprimir el stack trace expone detalles internos de la aplicación.",
+            "fix": "Loguee la excepción de forma controlada."
+        },
         
         # --- PHP ---
         r'shell_exec\(': {
