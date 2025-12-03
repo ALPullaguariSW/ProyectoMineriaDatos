@@ -6,6 +6,15 @@ import argparse
 from predict import load_model, scan_directory, generate_report
 from report_generator import generate_html_report
 
+import stat
+
+def remove_readonly(func, path, excinfo):
+    """
+    Error handler for shutil.rmtree to remove read-only files (like .git objects) on Windows.
+    """
+    os.chmod(path, stat.S_IWRITE)
+    func(path)
+
 def scan_external_repo(repo_url):
     """
     Clones a repo, scans it, generates reports, and cleans up.
@@ -18,7 +27,8 @@ def scan_external_repo(repo_url):
     
     # 1. Clone Repository
     if os.path.exists(temp_dir):
-        shutil.rmtree(temp_dir)
+        print(f"🧹 Removing existing temp directory: {temp_dir}")
+        shutil.rmtree(temp_dir, onerror=remove_readonly)
     
     print("⬇️  Cloning repository (shallow clone)...")
     try:
@@ -50,8 +60,7 @@ def scan_external_repo(repo_url):
     # 5. Cleanup
     print("🧹 Cleaning up temporary files...")
     try:
-        # On Windows, sometimes git files are locked. Ignore errors for now or try harder.
-        shutil.rmtree(temp_dir, ignore_errors=True) 
+        shutil.rmtree(temp_dir, onerror=remove_readonly)
     except Exception as e:
         print(f"⚠️ Warning: Could not fully remove temp dir: {e}")
 
