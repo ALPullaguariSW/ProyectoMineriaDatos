@@ -142,9 +142,9 @@ def generate_html_report(scan_results_file="scan_report.json", shap_image_path="
             </div>
 
             <!-- Critical Findings Section -->
-            <h2 class="section-title" style="color: #c0392b;">🚨 Hallazgos Críticos ({len(vulnerable_files_list)})</h2>
+            <h2 class="section-title">🚨 Hallazgos Críticos ({len(vulnerable_files_list)})</h2>
             
-            {'' if vulnerable_files_list else '<p style="text-align:center; padding:20px; background:white; border-radius:8px;">✅ ¡Felicidades! No se encontraron vulnerabilidades críticas.</p>'}
+            {'' if vulnerable_files_list else '<div class="stat-card" style="margin-bottom:30px;"><h3>✅ ¡Excelente!</h3><p>No se encontraron vulnerabilidades críticas en el código analizado.</p></div>'}
     """
 
     # Generate Cards for Vulnerable Files
@@ -157,34 +157,35 @@ def generate_html_report(scan_results_file="scan_report.json", shap_image_path="
             if isinstance(details.get('dangerous_calls'), list):
                 for finding in details['dangerous_calls']:
                     if isinstance(finding, dict):
-                        severity_color = "#e74c3c" if finding['severity'] in ["Critical", "High"] else "#f39c12"
+                        is_critical = finding['severity'] in ["Critical", "High"]
+                        severity_class = "critical" if is_critical else "warning"
+                        
                         details_html += f"""
-                        <div style="border-left: 4px solid {severity_color}; background: #fcfcfc; padding: 15px; margin-bottom: 15px; border-radius: 4px; border: 1px solid #eee;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                                <strong style="color: {severity_color};">{finding['type']}</strong>
-                                <span style="background: #34495e; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.8em;">Línea {finding['line']}</span>
+                        <div class="finding-detail {severity_class}">
+                            <div class="finding-header">
+                                <span class="finding-type">{finding['type']}</span>
+                                <span class="line-badge">Línea {finding['line']}</span>
                             </div>
-                            <p style="margin: 5px 0; color: #555; font-size: 0.95em;">{finding['description']}</p>
-                            <div style="background: #2c3e50; color: #ecf0f1; padding: 10px; border-radius: 4px; font-family: monospace; margin: 10px 0; font-size: 0.9em; overflow-x: auto;">
-                                {finding['content']}
-                            </div>
-                            <div style="margin-top: 8px; color: #27ae60; font-size: 0.9em; font-weight: 600;">
-                                💡 {finding['remediation']}
+                            <p style="margin: 0 0 10px 0;">{finding['description']}</p>
+                            <div class="code-block">{finding['content']}</div>
+                            <div class="remediation-box">
+                                <strong>💡 Solución:</strong> 
+                                <span>{finding['remediation']}</span>
                             </div>
                         </div>
                         """
                     else:
-                         details_html += f"<div>⚠️ {finding}</div>"
+                         details_html += f"<div class='finding-detail'>⚠️ {finding}</div>"
         
         if not details_html:
-             details_html = "<div style='padding:15px; background:#e8f4f8; color:#2980b9; border-radius:4px;'>🤖 Riesgo detectado por predicción ML (Patrón complejo).</div>"
+             details_html = "<div class='finding-detail' style='border-left-color: #3498db;'>🤖 <strong>Predicción ML:</strong> El modelo detectó patrones de riesgo basados en la estructura del código, aunque no hay coincidencias exactas de reglas.</div>"
 
         html_content += f"""
             <div class="finding-card vulnerable">
                 <div class="card-header">
                     <div class="file-name">{file_result['file']}</div>
                     <div>
-                        <span style="margin-right: 15px; color: #7f8c8d; font-size: 0.9em;">Riesgo: <strong>{prob}</strong></span>
+                        <span style="margin-right: 15px; color: #7f8c8d; font-size: 0.9em;">Confianza del Modelo: <strong>{prob}</strong></span>
                         <span class="badge badge-vuln">VULNERABLE</span>
                     </div>
                 </div>
@@ -196,34 +197,44 @@ def generate_html_report(scan_results_file="scan_report.json", shap_image_path="
 
     # Safe Files Section
     html_content += f"""
-            <h2 class="section-title" style="color: #27ae60;">✅ Archivos Seguros ({len(safe_files_list)})</h2>
-            <table class="safe-table">
-                <thead>
-                    <tr>
-                        <th>Archivo</th>
-                        <th>Confianza</th>
-                        <th>Estado</th>
-                    </tr>
-                </thead>
-                <tbody>
+            <h2 class="section-title" style="color: var(--success);">✅ Archivos Seguros ({len(safe_files_list)})</h2>
+            <div class="safe-table-container">
+                <table class="safe-table">
+                    <thead>
+                        <tr>
+                            <th>Archivo</th>
+                            <th>Confianza</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
     """
     
     for file_result in safe_files_list:
         html_content += f"""
-                    <tr>
-                        <td>{file_result['file']}</td>
-                        <td>{file_result.get('confidence', 0):.2%}</td>
-                        <td><span class="badge badge-safe">SEGURO</span></td>
-                    </tr>
+                        <tr>
+                            <td>{file_result['file']}</td>
+                            <td>{file_result.get('confidence', 0):.2%}</td>
+                            <td><span class="badge badge-safe">SEGURO</span></td>
+                        </tr>
         """
 
     # Scripts for Charts
     html_content += f"""
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <script>
+            // Common Chart Options
+            const chartOptions = {{
+                responsive: true,
+                plugins: {{
+                    legend: {{ position: 'bottom' }}
+                }}
+            }};
+
             // Files Chart
             new Chart(document.getElementById('filesChart'), {{
                 type: 'doughnut',
@@ -231,9 +242,11 @@ def generate_html_report(scan_results_file="scan_report.json", shap_image_path="
                     labels: ['Vulnerables', 'Seguros'],
                     datasets: [{{
                         data: [{len(vulnerable_files_list)}, {len(safe_files_list)}],
-                        backgroundColor: ['#e74c3c', '#27ae60']
+                        backgroundColor: ['#e74c3c', '#27ae60'],
+                        borderWidth: 0
                     }}]
-                }}
+                }},
+                options: chartOptions
             }});
 
             // Vulnerabilities Chart
@@ -242,15 +255,17 @@ def generate_html_report(scan_results_file="scan_report.json", shap_image_path="
                 data: {{
                     labels: {json.dumps(vuln_labels)},
                     datasets: [{{
-                        label: 'Cantidad',
+                        label: 'Cantidad de Hallazgos',
                         data: {json.dumps(vuln_counts)},
-                        backgroundColor: '#3498db'
+                        backgroundColor: '#3498db',
+                        borderRadius: 5
                     }}]
                 }},
                 options: {{
-                    responsive: true,
+                    ...chartOptions,
                     scales: {{
-                        y: {{ beginAtZero: true, ticks: {{ stepSize: 1 }} }}
+                        y: {{ beginAtZero: true, ticks: {{ stepSize: 1 }}, grid: {{ color: '#f0f0f0' }} }},
+                        x: {{ grid: {{ display: false }} }}
                     }}
                 }}
             }});
