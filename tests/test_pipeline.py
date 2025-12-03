@@ -2,6 +2,11 @@ import pytest
 import pandas as pd
 import os
 import joblib
+import sys
+
+# Add project root to sys.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from src.data_loader import load_data, generate_synthetic_data
 from src.preprocessing import clean_code, preprocess_data, extract_features
 from src.train_model import train_models
