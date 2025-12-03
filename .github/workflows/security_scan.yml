@@ -47,6 +47,20 @@ jobs:
           exit 1
         fi
 
+    - name: 📊 Generate Explanations (SHAP)
+      if: success()
+      run: |
+        python src/explain.py
+        
+    - name: 📤 Upload Reports
+      if: success()
+      uses: actions/upload-artifact@v3
+      with:
+        name: security-reports
+        path: |
+          scan_report.json
+          reports/figures/shap_summary.png
+
     - name: ❌ Notify Scan Failure
       if: failure() && steps.scan.outcome == 'failure'
       run: python src/notifications.py "❌ Security Alert! Vulnerabilities detected in the codebase. Pipeline blocked."
