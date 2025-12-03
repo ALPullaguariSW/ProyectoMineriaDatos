@@ -13,6 +13,14 @@ def generate_html_report(scan_results_file="scan_report.json", shap_image_path="
     try:
         with open(scan_results_file, 'r') as f:
             results = json.load(f)
+            # Handle case where results is a list (legacy format)
+            if isinstance(results, list):
+                results = {
+                    "results": results,
+                    "total_files": len(results),
+                    "vulnerable_files": sum(1 for r in results if r.get('status') == 'VULNERABLE'),
+                    "scan_duration": "N/A"
+                }
     except FileNotFoundError:
         print("No scan results found. Skipping report.")
         return
