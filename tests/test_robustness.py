@@ -1,6 +1,9 @@
-import pytest
+import sys
 import os
-import joblib
+
+# Add project root to sys.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from src.predict import predict_file
 from src.preprocessing import clean_code
 
