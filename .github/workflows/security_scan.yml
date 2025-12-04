@@ -50,7 +50,7 @@ jobs:
     - name: 📊 Generate Explanations (SHAP & HTML)
       if: success() || failure() # Run even if scan fails to generate report
       run: |
-        python src/assess/explain.py
+        # python src/assess/explain.py
         python src/assess/report_generator.py
         
     - name: 📤 Upload Reports
