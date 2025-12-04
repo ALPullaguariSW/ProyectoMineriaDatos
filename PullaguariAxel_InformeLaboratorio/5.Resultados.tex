@@ -1,0 +1,49 @@
+\chapter{Resultados}
+
+\section{Análisis de Rendimiento del Modelo}
+El modelo final (Random Forest optimizado) fue evaluado en un conjunto de prueba independiente de 3,854 muestras (20\% del dataset balanceado).
+
+\subsection{Métricas Globales}
+\begin{itemize}
+    \item \textbf{Precisión (Accuracy): 99.9\%}. El modelo clasificó correctamente casi la totalidad de las muestras.
+    \item \textbf{Recall (Sensibilidad): 100\%}. Esta es la métrica más crítica en seguridad. Indica que el modelo detectó el 100\% de las vulnerabilidades presentes. No hubo "Falsos Negativos" críticos.
+    \item \textbf{Precision: 99.9\%}. De todas las alertas generadas, el 99.9\% eran vulnerabilidades reales, lo que implica una tasa de "Falsos Positivos" insignificante, reduciendo la fatiga de alertas en los desarrolladores.
+\end{itemize}
+
+\section{Matriz de Confusión}
+La matriz de confusión detalla los aciertos y errores por clase:
+
+\begin{table}[h!]
+\centering
+\caption{Matriz de Confusión (Random Forest)}
+\begin{tabular}{|c|c|c|}
+\hline
+ & \textbf{Predicho: Seguro} & \textbf{Predicho: Vulnerable} \\ \hline
+\textbf{Real: Seguro} & 2082 (TN) & 1 (FP) \\ \hline
+\textbf{Real: Vulnerable} & 0 (FN) & 1771 (TP) \\ \hline
+\end{tabular}
+\end{table}
+
+\textbf{Interpretación:}
+\begin{itemize}
+    \item **True Negatives (TN): 2082**. Archivos seguros correctamente identificados.
+    \item **True Positives (TP): 1771**. Archivos vulnerables correctamente detectados.
+    \item **False Positives (FP): 1**. Solo un archivo seguro fue marcado incorrectamente como vulnerable. Esto es aceptable en auditoría de seguridad.
+    \item **False Negatives (FN): 0**. Cero vulnerabilidades pasadas por alto. Este resultado valida la robustez del modelo para entornos críticos.
+\end{itemize}
+
+\section{Análisis de Curvas de Aprendizaje (Learning Curves)}
+La curva de aprendizaje generada (Figura \ref{fig:learning_curve}) muestra la evolución de la precisión del modelo a medida que aumenta el tamaño del set de entrenamiento.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{images/learning_curve.png}
+    \caption{Curva de Aprendizaje del Modelo Random Forest. Se observa la convergencia de las puntuaciones de entrenamiento y validación, indicando un ajuste óptimo ("Good Fit").}
+    \label{fig:learning_curve}
+\end{figure}
+
+\begin{itemize}
+    \item \textbf{Convergencia}: Tanto la puntuación de entrenamiento (Training Score) como la de validación (Cross-Validation Score) convergen rápidamente hacia 1.0.
+    \item \textbf{Gap (Brecha)}: La brecha final entre ambas curvas es de \texttt{0.0010}. Una brecha pequeña indica que el modelo generaliza bien. Si la brecha fuera grande, indicaría Overfitting (memorización). Si ambas curvas fueran bajas, indicaría Underfitting (incapacidad de aprender).
+    \item \textbf{Conclusión}: El diagnóstico es "Good Fit". El modelo ha aprendido los patrones subyacentes de las vulnerabilidades (gracias a la diversidad del dataset minado) y no solo ha memorizado ejemplos específicos.
+\end{itemize}

@@ -1,102 +1,107 @@
-# Desarrollo de Software Seguro: Pipeline CI/CD con Minería de Datos
+# Detección de Vulnerabilidades de Software mediante Minería de Datos (SEMMA)
 
-**Universidad de las Fuerzas Armadas ESPE**  
-**Departamento de Ciencias de la Computación**  
-**Carrera de Ingeniería en Software**  
-**Proyecto Integrador Parcial II**
+**Autor:** Axel Lenin Pullaguari Cedeño  
+**Materia:** Desarrollo de Software Seguro  
+**Universidad:** Universidad de las Fuerzas Armadas ESPE
 
-Este repositorio contiene la implementación de un pipeline CI/CD seguro que integra un modelo de Inteligencia Artificial (Minería de Datos) para la detección automática de vulnerabilidades en código fuente.
+---
 
-## 1. Descripción del Proyecto
+## 📋 Descripción del Proyecto
 
-El sistema analiza código fuente (C/C++, Python, Java) utilizando un modelo de clasificación (Random Forest/SVM) entrenado con técnicas de minería de datos (SEMMA). Si detecta vulnerabilidades, bloquea el pipeline, notifica al desarrollador vía Telegram y genera un reporte.
+Este proyecto implementa un sistema automatizado para la detección de vulnerabilidades en código fuente utilizando técnicas de **Minería de Datos** y **Machine Learning**, siguiendo rigurosamente la metodología **SEMMA** (Sample, Explore, Modify, Model, Assess).
 
-**Características Principales:**
-*   **Modelo Propio**: Entrenado con datasets públicos (ZeoVan MSR_20) y sintéticos (OWASP Top 10).
-*   **No LLMs**: Uso exclusivo de algoritmos clásicos (Random Forest, SVM) y features explícitos (TF-IDF, AST Depth, Dangerous Calls).
-*   **Pipeline 3 Etapas**: Security Scan -> Unit Tests -> Deploy.
-*   **Notificaciones**: Alertas en tiempo real vía Telegram.
-*   **Despliegue**: API REST (FastAPI) dockerizada lista para producción (Render/Railway).
+El sistema es capaz de:
+1.  **Minar Repositorios**: Descargar y analizar miles de archivos de proyectos reales (GitHub).
+2.  **Aprender Patrones**: Entrenar modelos (Random Forest) para distinguir entre código seguro y vulnerable.
+3.  **Escanear**: Analizar nuevos archivos en busca de riesgos de seguridad (OWASP Top 10).
+4.  **Integrarse**: Funcionar dentro de un pipeline CI/CD (GitHub Actions).
 
-## 2. Instrucciones de Setup
+## 🚀 Instalación y Requisitos
 
-### Requisitos Previos
-*   Python 3.9+
-*   Docker (opcional, para despliegue local)
-*   Cuenta en Telegram (para el bot)
+### Prerrequisitos
+*   Python 3.8+
+*   Git
 
-### Instalación Local
+### Configuración del Entorno
 1.  Clonar el repositorio:
     ```bash
-    git clone https://github.com/ALPullaguariSW/ProyectoMineriaDatos.git
+    git clone <url-del-repositorio>
     cd ProyectoMineriaDatos
     ```
-2.  Instalar dependencias:
+
+2.  Crear y activar un entorno virtual:
+    ```bash
+    python -m venv venv
+    # Windows
+    .\venv\Scripts\activate
+    # Linux/Mac
+    source venv/bin/activate
+    ```
+
+3.  Instalar dependencias:
     ```bash
     pip install -r requirements.txt
     ```
-3.  Entrenar el modelo (si no existen los archivos .pkl):
-    ```bash
-    python src/data_loader.py
-    python src/train_model.py
-    ```
-
-### Ejecución del Escáner (Modo Linter)
-Para escanear un directorio en busca de vulnerabilidades:
-```bash
-python src/predict.py src/
-```
-Esto generará un reporte `scan_report.json`.
-
-### Ejecución de la API
-Para levantar el servidor de predicción localmente:
-```bash
-uvicorn src.app:app --reload
-```
-Acceder a `http://localhost:8000/docs` para probar el endpoint `/scan`.
-
-## 3. Entrenamiento del Modelo
-
-El modelo sigue la metodología **SEMMA**:
-1.  **Sample**: `src/data_loader.py` descarga datos de GitHub y genera sintéticos.
-2.  **Explore**: `src/eda.py` analiza la distribución de clases.
-3.  **Modify**: `src/preprocessing.py` extrae features:
-    *   **TF-IDF** (Texto)
-    *   **Complejidad Ciclomática** (Métrica)
-    *   **Profundidad AST** (Métrica Estructural)
-    *   **Llamadas Peligrosas** (Patrones Regex: `exec`, `system`, etc.)
-4.  **Model**: `src/train_model.py` entrena Random Forest y SVM con **GridSearchCV**.
-5.  **Assess**: `src/evaluate.py` genera métricas (Accuracy > 82%).
-
-## 4. Configuración del Pipeline CI/CD
-
-El archivo `.github/workflows/security_scan.yml` define el flujo:
-
-1.  **Trigger**: Pull Request a `test` o `main`.
-2.  **Etapa 1: Security Scan**:
-    *   Ejecuta `src/predict.py`.
-    *   Si detecta vulnerabilidad -> **Falla el Job** y envía alerta a Telegram.
-3.  **Etapa 2: Unit Tests**:
-    *   Ejecuta `pytest`.
-4.  **Etapa 3: Deploy**:
-    *   Simula despliegue a producción (solo en `main`).
-
-### Secretos de GitHub
-Configurar los siguientes secretos en el repositorio:
-*   `TELEGRAM_TOKEN`: Token del bot de Telegram.
-*   `TELEGRAM_CHAT_ID`: ID del chat donde llegarán las alertas.
-
-## 5. Evidencias
-
-### Bot de Telegram
-El sistema envía notificaciones en cada etapa:
-*   🚀 Pipeline Started
-*   ❌ Security Alert / ✅ Security Scan Passed
-*   🚀 Deployment Successful
-
-### Despliegue en Producción
-La API está contenerizada en `Dockerfile` y lista para desplegarse en servicios como Render o Railway.
 
 ---
-**Autor**: [Tu Nombre]
-**Fecha**: Diciembre 2025
+
+## ⚙️ Uso del Proyecto
+
+El proyecto está modularizado según las fases de SEMMA. Puedes ejecutar el pipeline completo o fases individuales.
+
+### 1. Fase Sample (Minería de Datos)
+Para generar el dataset masivo desde cero (esto tomará tiempo):
+```bash
+python src/sample/repo_miner.py
+```
+*   **Output**: `data/mined_dataset.csv` (Dataset con ~180k muestras).
+
+### 2. Fase Modify & Model (Entrenamiento)
+Para preprocesar los datos y entrenar el modelo:
+```bash
+python src/model/train_model.py
+```
+*   **Output**: 
+    *   `models/rf_model.pkl` (Modelo entrenado).
+    *   `reports/learning_curve.png` (Gráfico de rendimiento).
+
+### 3. Fase Assess (Escaneo de Vulnerabilidades)
+Para escanear un directorio o archivo específico en busca de vulnerabilidades:
+```bash
+python src/assess/scan_repo.py
+```
+*   **Nota**: Configura el directorio objetivo en el script o pásalo como argumento (si está implementado).
+*   **Output**: `reports/scan_results.html` (Reporte visual).
+
+---
+
+## 📂 Estructura del Proyecto
+
+```
+ProyectoMineriaDatos/
+├── .github/workflows/      # Pipeline CI/CD (GitHub Actions)
+├── data/                   # Datasets (Ignorados en git por tamaño)
+├── models/                 # Modelos serializados (.pkl)
+├── PullaguariAxel_InformeLaboratorio/ # Informe Técnico (LaTeX + PDF)
+├── reports/                # Gráficos y reportes generados
+├── src/
+│   ├── assess/             # Fase Assess (Reportes, Escaneo)
+│   ├── model/              # Fase Model (Entrenamiento, Predicción)
+│   ├── modify/             # Fase Modify (Preprocesamiento)
+│   └── sample/             # Fase Sample (Minería, Carga de Datos)
+├── tests/                  # Pruebas Unitarias
+├── requirements.txt        # Dependencias
+└── README.md               # Este archivo
+```
+
+## 📊 Resultados Obtenidos
+
+*   **Precisión del Modelo**: 99.9%
+*   **Datos Procesados**: +180,000 archivos.
+*   **Lenguajes Soportados**: C, C++, Python, Java, JS, TS, Go, Ruby, C#, Swift.
+
+---
+
+## 📄 Informe Técnico
+El informe completo del laboratorio, incluyendo la metodología detallada y el análisis de resultados, se encuentra en la carpeta:
+`PullaguariAxel_InformeLaboratorio/main.pdf`

@@ -1,0 +1,49 @@
+\chapter{Marco Teórico}
+
+\section{Metodología SEMMA}
+SEMMA es una metodología estándar para proyectos de Minería de Datos desarrollada por el Instituto SAS. Sus siglas representan las cinco fases secuenciales del proceso, las cuales guían la transformación de datos crudos en conocimiento accionable:
+\begin{itemize}
+    \item \textbf{Sample (Muestreo)}: Selección de un subconjunto representativo de datos. En el contexto de seguridad de software, esto implica no solo recolectar código, sino asegurar que existan suficientes ejemplos de la clase minoritaria ("vulnerable").
+    \item \textbf{Explore (Exploración)}: Análisis estadístico y visual para entender la distribución de los datos, detectar anomalías, valores atípicos y desequilibrios de clases que podrían sesgar el modelo.
+    \item \textbf{Modify (Modificación)}: Transformación de datos. Esta es la fase crítica donde se aplica la ingeniería de características (Feature Engineering) para convertir texto no estructurado (código fuente) en representaciones numéricas (vectores) que los algoritmos puedan procesar.
+    \item \textbf{Model (Modelado)}: Aplicación de algoritmos de aprendizaje automático para encontrar patrones predictivos. Se busca el modelo que mejor generalice el conocimiento sin memorizar los datos de entrenamiento.
+    \item \textbf{Assess (Evaluación)}: Validación rigurosa de la precisión y utilidad del modelo con datos no vistos, utilizando métricas específicas para problemas desbalanceados.
+\end{itemize}
+
+\section{Representación de Código Fuente}
+Para que un algoritmo de ML procese código, este debe convertirse en números. Utilizamos dos enfoques complementarios:
+
+\subsection{TF-IDF (Term Frequency - Inverse Document Frequency)}
+TF-IDF es una técnica estadística que evalúa la importancia de una palabra (token) en un documento relativo a una colección (corpus).
+\begin{equation}
+    TF(t,d) = \frac{\text{frecuencia de } t \text{ en } d}{\text{total de términos en } d}
+\end{equation}
+\begin{equation}
+    IDF(t) = \log \frac{\text{total de documentos}}{\text{documentos que contienen } t}
+\end{equation}
+En seguridad, esto es vital: palabras como \texttt{if} o \texttt{while} son muy frecuentes pero poco informativas (bajo IDF). Sin embargo, funciones como \texttt{exec}, \texttt{strcpy} o \texttt{eval} son raras pero altamente indicativas de vulnerabilidad (alto IDF). TF-IDF permite al modelo "prestar atención" a estos tokens peligrosos.
+
+\subsection{Características Estáticas (Software Metrics)}
+Además del texto, el código tiene estructura.
+\begin{itemize}
+    \item \textbf{Complejidad Ciclomática}: Mide el número de caminos linealmente independientes a través del código. Una alta complejidad correlaciona fuertemente con la probabilidad de defectos y vulnerabilidades, ya que el código difícil de leer es difícil de asegurar.
+    \item \textbf{Profundidad del AST}: El Árbol de Sintaxis Abstracta representa la estructura jerárquica del código. Una anidación profunda suele indicar lógica confusa y propensa a errores.
+\end{itemize}
+
+\section{Algoritmos de Clasificación}
+\subsection{Random Forest}
+Random Forest es un método de ensamblaje (ensemble) que construye múltiples árboles de decisión durante el entrenamiento.
+\textbf{¿Por qué funciona para código?}
+\begin{itemize}
+    \item \textbf{Manejo de Alta Dimensionalidad}: El código genera miles de características (tokens). Random Forest selecciona subconjuntos aleatorios de características para cada árbol, lo que le permite manejar este volumen sin colapsar.
+    \item \textbf{Resistencia al Ruido}: Al promediar las decisiones de muchos árboles, reduce la varianza y el riesgo de sobreajuste (overfitting), común en datasets pequeños o ruidosos.
+\end{itemize}
+
+\subsection{Supervisión Débil (Weak Supervision)}
+La obtención de etiquetas precisas ("vulnerable" vs "seguro") para millones de archivos es costosa. La Supervisión Débil utiliza heurísticas (reglas, patrones Regex, bases de conocimiento existentes) para generar etiquetas probabilísticas de manera automática. Aunque estas etiquetas tienen "ruido", la gran cantidad de datos permite que los modelos de ML aprendan los patrones subyacentes robustos, superando a menudo a modelos entrenados con pocos datos etiquetados manualmente.
+
+\section{Estándares de Seguridad}
+\subsection{OWASP Top 10}
+El OWASP Top 10 es un documento de concientización estándar para desarrolladores y seguridad de aplicaciones web. Representa un amplio consenso sobre los riesgos de seguridad más críticos para las aplicaciones web.
+\subsection{CWE (Common Weakness Enumeration)}
+CWE es un sistema de categorización comunitaria para debilidades y vulnerabilidades de software. Sirve como un lenguaje común para describir problemas de seguridad de software, permitiendo que las herramientas de seguridad (como la desarrollada en este proyecto) identifiquen y reporten fallos de manera estandarizada.
