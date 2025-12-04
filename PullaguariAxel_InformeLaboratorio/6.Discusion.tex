@@ -1,7 +1,0 @@
-\chapter{Discusión}
-
-Los resultados obtenidos validan la hipótesis de que la Minería de Datos es una herramienta eficaz para la detección automatizada de vulnerabilidades. La alta precisión del modelo (99.9\%) sugiere que los patrones sintácticos y léxicos (capturados por TF-IDF y AST) son indicadores fuertes de inseguridad en el código.
-
-Un hallazgo clave fue la importancia del **balanceo de datos**. Inicialmente, el modelo tendía a clasificar todo como "seguro" debido a la prevalencia de código limpio en los repositorios minados. La aplicación de técnicas de submuestreo en la fase \textit{Modify} de SEMMA fue determinante para corregir este sesgo.
-
-Además, la integración de una **Base de Conocimiento** basada en reglas (Regex) para el etiquetado automático (Weak Supervision) permitió escalar el entrenamiento a cientos de miles de muestras sin necesidad de etiquetado manual costoso, demostrando que los enfoques híbridos (Reglas + ML) son superiores a los métodos puramente estadísticos o puramente basados en firmas.
