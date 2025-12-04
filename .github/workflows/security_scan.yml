@@ -32,10 +32,10 @@ jobs:
       if: always()
       run: python src/assess/notifications.py "🚀 Pipeline Started for commit ${{ github.sha }}"
 
-    - name: 🧠 Train Model (Simulation)
-      run: |
-        python src/sample/data_loader.py
-        python src/model/train_model.py
+    # - name: 🧠 Train Model (Skipped in CI)
+    #   run: |
+    #     # We use the pre-trained model (models/rf_model.pkl) to avoid retraining on empty data.
+    #     echo "Using pre-trained model..."
 
     - name: 🛡️ Security Scan (Phase 1)
       id: scan
