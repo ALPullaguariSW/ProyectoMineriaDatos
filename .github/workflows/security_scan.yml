@@ -72,6 +72,20 @@ jobs:
             body: "❌ **Security Alert**: The AI Scanner detected potential vulnerabilities.\n\nPlease check the attached report or logs. Merging is blocked until fixed."
           })
 
+    - name: 📝 Create Security Issue (Requirement)
+      if: failure() && github.event_name == 'pull_request'
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const pr_number = context.issue.number;
+          github.rest.issues.create({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            title: `🔒 Security Vulnerability Detected in PR #${pr_number}`,
+            body: `The automated security scanner detected vulnerabilities in Pull Request #${pr_number}.\n\n**Action Required:**\n1. Review the scan report.\n2. Fix the identified issues.\n3. Push the changes to update the PR.`,
+            labels: ['security-risk', 'fixing-required']
+          });
+
     - name: 📊 Generate Reports
       if: always()
       run: |

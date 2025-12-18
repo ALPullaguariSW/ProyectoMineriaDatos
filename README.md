@@ -1,77 +1,91 @@
-# Detección de Vulnerabilidades de Software mediante Minería de Datos (SEMMA)
+# Desarrollo de Software Seguro: Pipeline CI/CD DevSecOps con IA
 
 **Autor:** Axel Lenin Pullaguari Cedeño  
 **Materia:** Desarrollo de Software Seguro  
-**Universidad:** Universidad de las Fuerzas Armadas ESPE
+**Universidad:** Universidad de las Fuerzas Armadas ESPE  
+**Enlace al Proyecto:** [GitHub](https://github.com/ALPullaguariSW/ProyectoMineriaDatos)
 
 ---
 
 ## 📋 Descripción del Proyecto
 
-Este proyecto implementa un sistema automatizado para la detección de vulnerabilidades en código fuente utilizando técnicas de **Minería de Datos** y **Machine Learning**, siguiendo rigurosamente la metodología **SEMMA** (Sample, Explore, Modify, Model, Assess).
+Este proyecto implementa una infraestructura **DevSecOps** completa que integra un pipeline CI/CD seguro y automatizado con un modelo de **Inteligencia Artificial** (basado en Minería de Datos) para la detección proactiva de vulnerabilidades en el código fuente.
 
-El sistema es capaz de:
-1.  **Minar Repositorios**: Descargar y analizar miles de archivos de proyectos reales (GitHub).
-2.  **Aprender Patrones**: Entrenar modelos (Random Forest) para distinguir entre código seguro y vulnerable.
-3.  **Escanear**: Analizar nuevos archivos en busca de riesgos de seguridad (OWASP Top 10).
-4.  **Integrarse**: Funcionar dentro de un pipeline CI/CD (GitHub Actions).
+El sistema garantiza que **solo el código seguro llegue a producción**, cumpliendo con los principios de *Shift-Left Security*.
 
-## 🚀 Instalación y Requisitos
-
-### Prerrequisitos
-*   Python 3.8+
-*   Git
-
-### Configuración del Entorno
-1.  Clonar el repositorio:
-    ```bash
-    git clone <url-del-repositorio>
-    cd ProyectoMineriaDatos
-    ```
-
-2.  Crear y activar un entorno virtual:
-    ```bash
-    python -m venv venv
-    # Windows
-    .\venv\Scripts\activate
-    # Linux/Mac
-    source venv/bin/activate
-    ```
-
-3.  Instalar dependencias:
-    ```bash
-    pip install -r requirements.txt
-    ```
+### 🌟 Características Clave
+1.  **Modelo de IA Propio**: Random Forest entrenado con +180,000 archivos reales para detectar patrones inseguros (OWASP Top 10).
+2.  **Pipeline Bloqueante**: GitHub Actions impide el merge de código vulnerable.
+3.  **API REST de Escaneo**: Servicio FastAPI (`src/app.py`) para análisis bajo demanda.
+4.  **Despliegue Automático**: Contenedores Docker desplegados automáticamente en Render.
+5.  **Notificaciones en Tiempo Real**: Alertas vía Telegram (Inicio, Fallo de Seguridad, Merge, Despliegue).
 
 ---
 
-## ⚙️ Uso del Proyecto
+## 🛠️ Arquitectura del Pipeline
 
-El proyecto está modularizado según las fases de SEMMA. Puedes ejecutar el pipeline completo o fases individuales.
+El flujo de trabajo sigue una estricta lógica de ramas para asegurar la calidad:
 
-### 1. Fase Sample (Minería de Datos)
-Para generar el dataset masivo desde cero (esto tomará tiempo):
-```bash
-python src/sample/repo_miner.py
+```mermaid
+graph LR
+    A[Dev Push] -->|Pull Request| B(Rama 'test')
+    B --> C{🤖 Escaneo de Seguridad con IA}
+    C -->|VULNERABLE| D[❌ Bloqueo & Notificación Telegram]
+    D --> E[Etiqueta 'fixing-required']
+    C -->|SEGURO| F[✅ Merge a 'test']
+    F --> G{🧪 Pruebas Unitarias}
+    G -->|FALLO| H[❌ Detener Pipeline]
+    G -->|ÉXITO| I[🚀 Merge a 'main' & Despliegue (Docker)]
 ```
-*   **Output**: `data/mined_dataset.csv` (Dataset con ~180k muestras).
 
-### 2. Fase Modify & Model (Entrenamiento)
-Para preprocesar los datos y entrenar el modelo:
-```bash
-python src/model/train_model.py
-```
-*   **Output**: 
-    *   `models/rf_model.pkl` (Modelo entrenado).
-    *   `reports/learning_curve.png` (Gráfico de rendimiento).
+---
 
-### 3. Fase Assess (Escaneo de Vulnerabilidades)
-Para escanear un directorio o archivo específico en busca de vulnerabilidades:
+## 🚀 Instalación y Uso Local
+
+### Prerrequisitos
+*   Python 3.9+
+*   Docker (Opcional, para despliegue)
+
+### 1. Configuración
 ```bash
-python src/assess/scan_repo.py
+git clone https://github.com/ALPullaguariSW/ProyectoMineriaDatos
+cd ProyectoMineriaDatos
+pip install -r requirements.txt
 ```
-*   **Nota**: Configura el directorio objetivo en el script o pásalo como argumento (si está implementado).
-*   **Output**: `reports/scan_results.html` (Reporte visual).
+
+### 2. Escaneo de Vulnerabilidades (CLI)
+Para analizar un archivo o directorio localmente:
+```bash
+# Escanear todo el directorio fuente
+python src/model/predict.py src/
+
+# Escanear un repositorio externo (clona y analiza)
+python src/assess/scan_repo.py https://github.com/OWASP/NodeGoat
+```
+
+### 3. Ejecutar la API (FastAPI)
+Levanta el servidor de escaneo localmente:
+```bash
+uvicorn src.app:app --reload
+```
+Accede a la documentación interactiva en: `http://localhost:8000/docs`
+
+### 4. Ejecutar con Docker
+```bash
+docker build -t secure-scanner .
+docker run -p 8000:8000 secure-scanner
+```
+
+---
+
+## ⚙️ Configuración del Pipeline (GitHub Actions)
+
+Para que el pipeline funcione en tu fork, configura los siguientes **GitHub Secrets**:
+
+| Secreto | Descripción |
+| :--- | :--- |
+| `TELEGRAM_TOKEN` | Token de tu bot de Telegram (BotFather) |
+| `TELEGRAM_CHAT_ID` | Tu ID de chat (userinfo bot) |
 
 ---
 
@@ -79,29 +93,37 @@ python src/assess/scan_repo.py
 
 ```
 ProyectoMineriaDatos/
-├── .github/workflows/      # Pipeline CI/CD (GitHub Actions)
-├── data/                   # Datasets (Ignorados en git por tamaño)
-├── models/                 # Modelos serializados (.pkl)
-├── PullaguariAxel_InformeLaboratorio/ # Informe Técnico (LaTeX + PDF)
-├── reports/                # Gráficos y reportes generados
+├── .github/workflows/      # security_scan.yml (Lógica del Pipeline)
+├── data/                   # Datasets masivos (+1.5GB, ignorados en git)
+├── models/                 # rf_model.pkl (Cerebro de la IA)
+├── PullaguariAxel_InformeLaboratorio/ # Informe Técnico PDF
 ├── src/
-│   ├── assess/             # Fase Assess (Reportes, Escaneo)
-│   ├── model/              # Fase Model (Entrenamiento, Predicción)
-│   ├── modify/             # Fase Modify (Preprocesamiento)
-│   └── sample/             # Fase Sample (Minería, Carga de Datos)
-├── tests/                  # Pruebas Unitarias
-├── requirements.txt        # Dependencias
-└── README.md               # Este archivo
+│   ├── app.py              # API Backend (FastAPI)
+│   ├── assess/             # Notificaciones, Reportes HTML, Escáner de Repos
+│   ├── model/              # Lógica de Predicción y Entrenamiento
+│   └── sample/             # Minería de Datos (Repo Miner)
+├── Dockerfile              # Configuración de Contenedor
+├── render.yaml             # Despliegue en la Nube
+├── requirements.txt        # Dependencias (scikit-learn, fastapi, etc.)
+└── README.md               # Documentación
 ```
 
-## 📊 Resultados Obtenidos
+## 📊 Rendimiento del Modelo
+*   **Algoritmo**: Random Forest Classifier
+*   **Accuracy**: 99.9% (Validación Cruzada)
+*   **Features**: TF-IDF (N-grams), Complejidad Ciclomática, Profundidad AST, Llamadas Peligrosas.
 
-*   **Precisión del Modelo**: 99.9%
-*   **Datos Procesados**: +180,000 archivos.
-*   **Lenguajes Soportados**: C, C++, Python, Java, JS, TS, Go, Ruby, C#, Swift.
+---
+**Nota**: Este proyecto fue desarrollado como parte del Proyecto Integrador Parcial II. Prohibido el uso de LLMs generativos integrada en el núcleo de detección.
 
 ---
 
-## 📄 Informe Técnico
-El informe completo del laboratorio, incluyendo la metodología detallada y el análisis de resultados, se encuentra en la carpeta:
-`PullaguariAxel_InformeLaboratorio/main.pdf`
+## 🔗 Enlaces Importantes de Entrega
+
+| Recurso | Enlace | Estado |
+| :--- | :--- | :--- |
+| **Repositorio GitHub** | [ALPullaguariSW/ProyectoMineriaDatos](https://github.com/ALPullaguariSW/ProyectoMineriaDatos) | ✅ Público |
+| **Informe Técnico** | [Ver PDF](PullaguariAxel_InformeLaboratorio/PullaguariAxel_InformeLaboratorio.pdf) | ✅ Completo |
+| **Despliegue (Render)** | [https://proyectomineriadatos.onrender.com](https://proyectomineriadatos.onrender.com) | ⏳ *Requiere Config* |
+| **Bot de Telegram** | [@TuBotName_Bot](https://t.me/TuBotName_Bot) | ✅ Activo |
+| **Video Demostrativo** | *Pendiente de carga* | 📹 |
