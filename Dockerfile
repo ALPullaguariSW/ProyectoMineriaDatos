@@ -1,20 +1,23 @@
-# Use an official Python runtime as a parent image
+# Use official Python runtime as a parent image
 FROM python:3.9-slim
 
-# Set the working directory in the container
+# Set working directory
 WORKDIR /app
 
-# Copy the current directory contents into the container at /app
-COPY . /app
+# Copy requirement file first for caching
+COPY requirements.txt .
 
-# Install any needed packages specified in requirements.txt
+# Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Make port 8000 available to the world outside this container
+# Copy the rest of the application
+COPY . .
+
+# Set PYTHONPATH to include src
+ENV PYTHONPATH="${PYTHONPATH}:/app/src"
+
+# Expose port 8000
 EXPOSE 8000
 
-# Define environment variable
-ENV PYTHONPATH /app/src
-
-# Run app.py when the container launches
+# Run the API with Uvicorn
 CMD ["uvicorn", "src.app:app", "--host", "0.0.0.0", "--port", "8000"]

@@ -2,13 +2,18 @@ name: Security Pipeline (SEMMA)
 
 on:
   push:
-    branches: [ "main", "test" ]
+    branches: [ "main" ] # Deploy on push to main
   pull_request:
-    branches: [ "main", "test" ]
+    branches: [ "test" ] # SafeScan Logic on PR to test
 
 jobs:
   security-pipeline:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+      
     env:
       TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
       TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
@@ -17,6 +22,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
+      with:
+        fetch-depth: 0 # Full history for SHAP/Diffs
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -30,54 +37,75 @@ jobs:
 
     - name: 🚀 Notify Pipeline Start
       if: always()
-      run: python src/assess/notifications.py "🚀 Pipeline Started for commit ${{ github.sha }}"
-
-    # - name: 🧠 Train Model (Skipped in CI)
-    #   run: |
-    #     # We use the pre-trained model (models/rf_model.pkl) to avoid retraining on empty data.
-    #     echo "Using pre-trained model..."
+      run: python src/assess/notifications.py "🚀 Pipeline Started for commit ${{ github.sha }} (Branch: ${{ github.ref_name }})"
 
     - name: 🛡️ Security Scan (Phase 1)
       id: scan
+      continue-on-error: true # Allow pipeline to continue so we can report and label
       run: |
         python src/model/predict.py src/ > scan_output.txt
         cat scan_output.txt
         if grep -q "\[VULNERABLE\]" scan_output.txt; then
+          echo "STATUS=VULNERABLE" >> $GITHUB_ENV
           echo "Vulnerabilities found!"
           exit 1
+        else
+          echo "STATUS=SAFE" >> $GITHUB_ENV
         fi
 
-    - name: 📊 Generate Explanations (SHAP & HTML)
-      if: success() || failure() # Run even if scan fails to generate report
+    - name: 🏷️ Label PR & Comment (On Vulnerability)
+      if: failure() && github.event_name == 'pull_request'
+      uses: actions/github-script@v6
+      with:
+        script: |
+          github.rest.issues.addLabels({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            labels: ['fixing-required', 'security-risk']
+          })
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: "❌ **Security Alert**: The AI Scanner detected potential vulnerabilities.\n\nPlease check the attached report or logs. Merging is blocked until fixed."
+          })
+
+    - name: 📊 Generate Reports
+      if: always()
       run: |
-        # python src/assess/explain.py
+        # python src/assess/explain.py # Disabled for stability
         python src/assess/report_generator.py
         
     - name: 📤 Upload Reports
-      if: success() || failure()
+      if: always()
       uses: actions/upload-artifact@v4
       with:
         name: security-reports
         path: |
           scan_report.json
-          reports/figures/shap_summary.png
           security_report.html
 
     - name: ❌ Notify Scan Failure
-      if: failure() && steps.scan.outcome == 'failure'
-      run: python src/assess/notifications.py "❌ Security Alert! Vulnerabilities detected in the codebase. Pipeline blocked."
+      if: env.STATUS == 'VULNERABLE'
+      run: python src/assess/notifications.py "❌ Security Alert! Vulnerabilities detected. PR blocked and labeled 'fixing-required'."
+
+    - name: ⛔ Block Pipeline on Vulnerability
+      if: env.STATUS == 'VULNERABLE'
+      run: exit 1
 
     - name: ✅ Notify Scan Success
-      if: success()
-      run: python src/assess/notifications.py "✅ Security Scan Passed. No vulnerabilities found."
+      if: env.STATUS == 'SAFE'
+      run: python src/assess/notifications.py "✅ Security Scan Passed. Code is safe for merging."
 
     - name: 🧪 Unit Tests (Phase 2)
+      if: success()
       run: |
-        pytest tests/
+        pytest tests/ || (python src/assess/notifications.py "❌ Tests Failed! Pipeline stopped." && exit 1)
 
     - name: 🚀 Deploy to Production (Phase 3)
       if: github.ref == 'refs/heads/main' && success()
       run: |
-        echo "Deploying to production..."
-        # Add actual deployment commands here (e.g., docker push)
-        python src/assess/notifications.py "🚀 Deployment Successful! API is live."
+        echo "Deploying to production (Simulated via Render Blueprint)..."
+        # Render deploys automatically on push to main, so we just notify
+        python src/assess/notifications.py "🚀 Deployment Triggered! The new version is going live on Render."
