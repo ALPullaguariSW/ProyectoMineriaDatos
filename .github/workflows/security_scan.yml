@@ -37,7 +37,8 @@ jobs:
 
     - name: 🚀 Notify Pipeline Start
       if: always()
-      run: python src/assess/notifications.py "🚀 Pipeline Started for commit ${{ github.sha }} (Branch: ${{ github.ref_name }})"
+      run: |
+        python src/assess/notifications.py "🚀 Pipeline Started for commit ${{ github.sha }} (Branch: ${{ github.ref_name }})"
 
     - name: 🛡️ Security Scan (Phase 1)
       id: scan
