@@ -1,0 +1,44 @@
+# Datasets (The big heavy files)
+data/
+
+# Git
+.git
+.gitignore
+
+# Documentation & Reports
+PullaguariAxel_InformeLaboratorio/
+PullaguariAxel_InformeLaboratorio.pdf
+tex/
+*.md
+
+# Virtual Environments
+venv/
+env/
+.env
+
+# Python Cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info
+.pytest_cache/
+.coverage
+
+# Temporary Scan Files
+temp_*
+temp_scan_*
+scan_output.txt
+scan_report.json
+security_report.html
+
+# Tests
+tests/
+
+# Automation Configs
+.github/
+render.yaml
+docker-compose.yml
+.dockerignore
+Dockerfile
